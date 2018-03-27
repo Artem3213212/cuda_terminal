@@ -24,7 +24,8 @@ class Command:
 
         timer_proc(TIMER_START, self.timer_update, 150, tag="")
         self.p = Popen(
-            self.shell_path, 
+            'ddddddd', #self.shell_path,
+            #stdin = , 
             stdout = PIPE, 
             stderr = STDOUT, 
             shell = True
@@ -61,6 +62,8 @@ class Command:
             
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
         
+        self.memo.set_prop(PROP_RO, True)
+        self.memo.set_prop(PROP_CARET_VIRTUAL, False)
         self.memo.set_prop(PROP_GUTTER_ALL, False)
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
@@ -83,15 +86,15 @@ class Command:
 
 
     def timer_update(self, tag='', info=''):
-        ss=self.p.stdout.read()
+        ss = self.p.stdout.read()
         try:
-            s=ss.decode()
+            s = ss.decode()
         except:
-            s=ss.decode("cp1251")
-        if s=='':
+            s = ss.decode("cp1251")
+        if not s:
             return
-        self.s=self.s+s
-        self.memo.set_text_all(self.s)
+            
+        self.add_output(s)
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
@@ -106,4 +109,17 @@ class Command:
     def run_cmd(self, text):
     
         print('run:', text)
+        #self.p.stdin.write(text)
+        
+        
+    def add_output(self, s):
+    
+        self.memo.set_prop(PROP_RO, False)
+        text = self.memo.get_text_all()
+        self.memo.set_text_all(text+s)
+        self.memo.set_prop(PROP_RO, true)
+        
+        n = self.memo.get_line_count()-1
+        line = self.memo.get_text_line(n)
+        self.memo.set_caret(len(line), n)
         
