@@ -13,9 +13,9 @@ class Command:
         
         self.edit.set_text_all('Test...\nok?')
         
-        
 
     def init_form(self):
+    
         h = dlg_proc(0, DLG_CREATE)
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         
@@ -25,6 +25,10 @@ class Command:
             'name': 'edit',
             'align': ALIGN_CLIENT,
             })
+        
+        self.edit.set_prop(PROP_GUTTER_ALL, False)
+        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextFont, 0xFFFFFF))
+        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextBg, 0x0))
         
         return h
 
