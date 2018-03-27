@@ -3,9 +3,17 @@ import os
 from cudatext import *
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
+fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_termilal.ini')
+
 
 class Command:
 
+    def __init__(self):
+
+        self.shell_path = ini_read(fn_config, 'op', 'shell_path', '/bin/bash')
+        self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
+        self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
+            
     def open(self):
     
         self.title = 'Terminal'
@@ -29,8 +37,16 @@ class Command:
             })
         
         self.edit.set_prop(PROP_GUTTER_ALL, False)
-        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextFont, 0xFFFFFF))
-        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextBg, 0x0))
+        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
+        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
         
         return h
 
+
+    def config(self):
+
+        ini_write(fn_config, 'op', 'shell_path', self.shell_path)
+        ini_write(fn_config, 'colors', 'back', hex(self.color_back))
+        ini_write(fn_config, 'colors', 'font', hex(self.color_font))
+        
+        file_open(fn_config)
