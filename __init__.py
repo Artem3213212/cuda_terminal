@@ -44,7 +44,7 @@ class Command:
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         nn = dlg_proc(h, DLG_CTL_ADD, 'editor')
         
-        self.edit = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=nn))
         
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
@@ -61,9 +61,9 @@ class Command:
             
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
         
-        self.edit.set_prop(PROP_GUTTER_ALL, False)
-        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
-        self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
+        self.memo.set_prop(PROP_GUTTER_ALL, False)
+        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
+        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
         
         self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
@@ -91,7 +91,7 @@ class Command:
         if s=='':
             return
         self.s=self.s+s
-        self.edit.set_text_all(self.s)
+        self.memo.set_text_all(self.s)
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
