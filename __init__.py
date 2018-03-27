@@ -1,10 +1,12 @@
 import sys
 import os
 from cudatext import *
+import cudatext_keys as keys
 from subprocess import Popen, PIPE, STDOUT
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
+MAX_HISTORY = 20
 
 
 class Command:
@@ -14,6 +16,32 @@ class Command:
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', '/bin/bash')
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
+        self.history = []
+        self.h_menu = menu_proc(0, MENU_CREATE)
+        
+        self.menu_calls = []
+        self.menu_calls += [ lambda: self.run_cmd_n(0) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(1) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(2) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(3) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(4) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(5) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(6) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(7) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(8) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(9) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(10) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(11) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(12) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(13) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(14) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(15) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(16) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(17) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(18) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(19) ]
+        self.menu_calls += [ lambda: self.run_cmd_n(20) ]
+    
             
     def open(self):
     
@@ -104,12 +132,47 @@ class Command:
             self.input.set_text_all('')
             self.input.set_caret(0, 0)
             self.run_cmd(text)
+            return False
+            
+        if (id_ctl==keys.VK_DOWN):
+            self.show_history()
+            return False
+            
 
-
-    def run_cmd(self, text):
+    def show_history(self):
     
+        menu_proc(self.h_menu, MENU_CLEAR)
+        for (index, item) in enumerate(self.history):
+            menu_proc(self.h_menu, MENU_ADD, 
+                index=0, 
+                caption=item, 
+                command=self.menu_calls[index],
+                )
+                
+        prop = dlg_proc(self.h_dlg, DLG_CTL_PROP_GET, name='input')
+        x, y = prop['x'] + prop['w'], prop['y']
+        x, y = dlg_proc(self.h_dlg, DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
+        menu_proc(self.h_menu, MENU_SHOW, command=(x, y))
+        
+        
+    def run_cmd(self, text):
+
+        while len(self.history) > MAX_HISTORY:
+            del self.history[0]
+
+        try:
+            n = self.history.index(text)
+            del self.history[n]
+        except:
+            pass
+            
+        self.history += [text]    
         print('run:', text)
-        #self.p.stdin.write(text)
+
+
+    def run_cmd_n(self, n):
+    
+        self.run_cmd(self.history[n])        
         
         
     def add_output(self, s):
