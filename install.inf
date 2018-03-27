@@ -1,12 +1,11 @@
 [info]
 title=Terminal
-desc=Plugin for CudaText: Terminal Emulator
+desc=Gives "Terminal" panel in the bottom panel of CudaText
 type=cudatext-plugin
 subdir=cuda_terminal
-homepage=
+homepage=https://github.com/Artem3213212/cuda_terminal
 
 [item2]
 section=commands
 caption=Terminal
-method=Open
-
+method=open
