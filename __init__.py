@@ -8,8 +8,10 @@ class Command:
 
     def open(self):
     
+        self.title = 'Terminal'
         self.h_dlg = self.init_form()
-        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, ("Terminal", self.h_dlg, fn_icon))
+        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
+        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
         
         self.edit.set_text_all('Test...\nok?')
         
