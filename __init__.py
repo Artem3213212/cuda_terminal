@@ -34,9 +34,3 @@ class Command:
         
         return h
 
-
-    def on_console(self, ed_self, text):
-        pass
-    
-    def on_console_nav(self, ed_self, text):
-        pass
