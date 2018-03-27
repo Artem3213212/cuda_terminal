@@ -22,26 +22,53 @@ class Command:
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
 
-        timer_proc(TIMER_START, self.update, 150, tag="")
-        self.p = Popen('C:\\Windows\\System32\\cmd.exe', stdout = PIPE, stderr = STDOUT, shell = True)
+        timer_proc(TIMER_START, self.timer_update, 150, tag="")
+        self.p = Popen(
+            self.shell_path, 
+            stdout = PIPE, 
+            stderr = STDOUT, 
+            shell = True
+            )
         self.s = ''
                 
 
     def init_form(self):
     
         h = dlg_proc(0, DLG_CREATE)
+        dlg_proc(h, DLG_PROP_SET, prop={
+            'border': False,
+            'keypreview': True,
+            'on_key_down': self.form_key_down,
+            })
+        
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
+        nn = dlg_proc(h, DLG_CTL_ADD, 'editor')
         
         self.edit = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=nn))
         
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'edit',
+            'name': 'memo',
             'align': ALIGN_CLIENT,
             })
+        
+        dlg_proc(h, DLG_CTL_PROP_SET, index=nn, prop={
+            'name': 'input',
+            'border': True,
+            'align': ALIGN_BOTTOM,
+            'h': 25,
+            })
+            
+        dlg_proc(h, DLG_CTL_FOCUS, name='input')
         
         self.edit.set_prop(PROP_GUTTER_ALL, False)
         self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.edit.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
+        
+        self.input.set_prop(PROP_GUTTER_ALL, False)
+        self.input.set_prop(PROP_ONE_LINE, True)
+        self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
+        self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
         
         return h
 
@@ -55,7 +82,7 @@ class Command:
         file_open(fn_config)
 
 
-    def update(self, tag='', info=''):
+    def timer_update(self, tag='', info=''):
         ss=self.p.stdout.read()
         try:
             s=ss.decode()
@@ -67,3 +94,16 @@ class Command:
         self.edit.set_text_all(self.s)
 
 
+    def form_key_down(self, id_dlg, id_ctl, data='', info=''):
+    
+        if id_ctl==13: #Enter
+            text = self.input.get_text_line(0)
+            self.input.set_text_all('')
+            self.input.set_caret(0, 0)
+            self.run_cmd(text)
+
+
+    def run_cmd(self, text):
+    
+        print('run:', text)
+        
