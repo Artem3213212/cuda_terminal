@@ -1,0 +1,12 @@
+[info]
+title=Terminal
+desc=Plugin for CudaText: Terminal Emulator
+type=cudatext-plugin
+subdir=cuda_terminal
+homepage=
+
+[item2]
+section=commands
+caption=Terminal
+method=Open
+
