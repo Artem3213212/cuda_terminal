@@ -9,3 +9,9 @@ homepage=https://github.com/Artem3213212/cuda_terminal
 section=commands
 caption=Terminal
 method=open
+
+[item10]
+section=commands
+caption=Terminal\Config
+method=config
+menu=o
