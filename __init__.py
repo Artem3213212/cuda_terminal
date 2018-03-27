@@ -1,6 +1,7 @@
 import sys
 import os
 from cudatext import *
+from subprocess import Popen, PIPE, STDOUT
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_termilal.ini')
@@ -20,9 +21,11 @@ class Command:
         self.h_dlg = self.init_form()
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-        
-        self.edit.set_text_all('Test...\nok?')
-        
+
+        timer_proc(TIMER_START, self.update, 150, tag="")
+        self.p = Popen('C:\\Windows\\System32\\cmd.exe', stdout = PIPE, stderr = STDOUT, shell = True)
+        self.s = ''
+                
 
     def init_form(self):
     
@@ -50,3 +53,17 @@ class Command:
         ini_write(fn_config, 'colors', 'font', hex(self.color_font))
         
         file_open(fn_config)
+
+
+    def update(self, tag='', info=''):
+        ss=self.p.stdout.read()
+        try:
+            s=ss.decode()
+        except:
+            s=ss.decode("cp1251")
+        if s=='':
+            return
+        self.s=self.s+s
+        self.edit.set_text_all(self.s)
+
+
