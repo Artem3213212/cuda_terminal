@@ -4,7 +4,7 @@ from cudatext import *
 from subprocess import Popen, PIPE, STDOUT
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
-fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_termilal.ini')
+fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 
 
 class Command:
