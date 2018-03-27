@@ -117,7 +117,7 @@ class Command:
         self.memo.set_prop(PROP_RO, False)
         text = self.memo.get_text_all()
         self.memo.set_text_all(text+s)
-        self.memo.set_prop(PROP_RO, true)
+        self.memo.set_prop(PROP_RO, True)
         
         n = self.memo.get_line_count()-1
         line = self.memo.get_text_line(n)
