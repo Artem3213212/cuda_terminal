@@ -3,15 +3,14 @@ import os
 from cudatext import *
 import cudatext_keys as keys
 from subprocess import Popen, PIPE, STDOUT
+from threading import Thread, Lock
 from time import sleep
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
-<<<<<<< HEAD
 DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash' 
 
-from threading import Thread,Lock
 class ControlTh(Thread):
     def __init__(self,Cmd):
         Thread.__init__(self)
@@ -27,10 +26,6 @@ class ControlTh(Thread):
                 return
             self.Cmd.block.release()
             
-=======
-DEF_SHELL = r'%windir%\system32\cmd.exe' if os.name=='nt' else 'bash' 
->>>>>>> 8a39475b061584e970a037f345e29753b4499d90
-
 
 class Command:
 
