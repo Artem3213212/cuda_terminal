@@ -17,14 +17,17 @@ class ControlTh(Thread):
         self.Cmd=Cmd
     def run(self):
         while True:
-            ss=self.Cmd.p.stdout.read(1)
-            self.Cmd.block.acquire()
-            s=ss.decode("cp1251")
-            self.Cmd.add_output(s)
-            if s=='>':
+            pp1 = self.Cmd.p.stdout.tell()
+            self.Cmd.p.stdout.seek(0, 2)
+            pp2 = self.Cmd.p.stdout.tell()
+            self.Cmd.p.stdout.seek(pp1)
+            if pp1!=pp2:          
+                ss = self.Cmd.p.stdout.read(pp2-pp1)
+                self.Cmd.block.acquire()
+                s = ss.decode("cp1251")
+                self.Cmd.add_output(s)
                 self.Cmd.block.release()
-                return
-            self.Cmd.block.release()
+            sleep(0.01)
             
 
 class Command:
@@ -75,7 +78,8 @@ class Command:
             stdin = PIPE, 
             stdout = PIPE, 
             stderr = STDOUT, 
-            shell = True,bufsize = 0
+            shell = True,
+            bufsize = 0
             )
         self.block.acquire()
         self.CtlTh=ControlTh(self)
@@ -148,7 +152,8 @@ class Command:
             return
             
         self.add_output(s)'''
-        sleep(0.01)
+        self.p.stdin.write(('exit/n').encode("cp1251"))
+        sleep(0.001)
         self.block.acquire()
 
 
@@ -195,8 +200,6 @@ class Command:
             
         self.history += [text] 
         self.p.stdin.write((text+'/n').encode("cp1251"))
-        self.CtlTh=ControlTh(self)
-        self.CtlTh.start()
         #self.p.stdin.flush()
         print('run:', text)
 
