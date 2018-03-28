@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE, STDOUT
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
-DEF_SHELL = r'%windir%\system32\cmd.exe' if os.name=='nt' else '/bin/bash' 
+DEF_SHELL = r'%windir%\system32\cmd.exe' if os.name=='nt' else 'bash' 
 
 
 class Command:
