@@ -9,7 +9,7 @@ from time import sleep
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
-DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash' 
+DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash'
 
 class ControlTh(Thread):
     def __init__(self,Cmd):
@@ -17,18 +17,19 @@ class ControlTh(Thread):
         self.Cmd=Cmd
     def run(self):
         while True:
-            pp1 = self.Cmd.p.stdout.tell()
-            self.Cmd.p.stdout.seek(0, 2)
-            pp2 = self.Cmd.p.stdout.tell()
-            self.Cmd.p.stdout.seek(pp1)
-            if pp1!=pp2:          
-                ss = self.Cmd.p.stdout.read(pp2-pp1)
+            ss = self.Cmd.p.stdout.read(1)
+            if self.Cmd.p.poll() != None:
                 self.Cmd.block.acquire()
-                s = ss.decode("cp1251")
+                s = "\nConsole process was terminated."
                 self.Cmd.add_output(s)
                 self.Cmd.block.release()
-            sleep(0.01)
-            
+                break
+            if ss != '':      
+                self.Cmd.block.acquire()
+                s = (ss).decode("cp1251")
+                self.Cmd.add_output(s)
+                self.Cmd.block.release()
+    
 
 class Command:
 
@@ -74,14 +75,15 @@ class Command:
         timer_proc(TIMER_START, self.timer_update, 150, tag="")
         self.block = Lock()
         self.p = Popen(
-            os.path.expandvars('%windir%\system32\cmd'),
-            stdin = PIPE, 
-            stdout = PIPE, 
-            stderr = STDOUT, 
+            os.path.expandvars(self.shell_path),
+            stdin = PIPE,
+            stdout = PIPE,
+            stderr = STDOUT,
             shell = True,
             bufsize = 0
             )
         self.block.acquire()
+        self.p.stdin.flush()
         self.CtlTh=ControlTh(self)
         self.CtlTh.start()
         self.s = ''
@@ -141,19 +143,7 @@ class Command:
 
     def timer_update(self, tag='', info=''):
         self.block.release()
-        '''#ss = self.p.stdin.write('exit')    
-        ss = self.p.stdin.flush()
-        ss = self.p.stdout.read()
-        #try:
-            #s = ss.decode()
-        #except:
-        s = ss.decode("cp1251")
-        if not s:
-            return
-            
-        self.add_output(s)'''
-        self.p.stdin.write(('exit/n').encode("cp1251"))
-        sleep(0.001)
+        sleep(0.01)
         self.block.acquire()
 
 
@@ -199,8 +189,8 @@ class Command:
             pass
             
         self.history += [text] 
-        self.p.stdin.write((text+'/n').encode("cp1251"))
-        #self.p.stdin.flush()
+        self.p.stdin.write((text+'\r\n').encode("cp1251"))
+        self.p.stdin.flush()
         print('run:', text)
 
 
@@ -219,4 +209,3 @@ class Command:
         n = self.memo.get_line_count()-1
         line = self.memo.get_text_line(n)
         self.memo.set_caret(len(line),n)
-        
