@@ -7,13 +7,14 @@ from subprocess import Popen, PIPE, STDOUT
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
+DEF_SHELL = r'%windir%\system32\cmd.exe' if os.name=='nt' else '/bin/bash' 
 
 
 class Command:
 
     def __init__(self):
 
-        self.shell_path = ini_read(fn_config, 'op', 'shell_path', '/bin/bash')
+        self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
         self.history = []
@@ -52,7 +53,7 @@ class Command:
 
         timer_proc(TIMER_START, self.timer_update, 150, tag="")
         self.p = Popen(
-            'ddddddd', #self.shell_path,
+            os.path.expandvars(self.shell_path),
             #stdin = , 
             stdout = PIPE, 
             stderr = STDOUT, 
