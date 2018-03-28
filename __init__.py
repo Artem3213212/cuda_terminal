@@ -5,30 +5,37 @@ import cudatext_keys as keys
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock
 from time import sleep
-
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
 DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash'
 
+sys.stderr=open('1.log', 'w', buffering = 1)
 class ControlTh(Thread):
-    def __init__(self,Cmd):
+    def __init__(self, Cmd):
         Thread.__init__(self)
-        self.Cmd=Cmd
+        self.Cmd = Cmd
     def run(self):
-        while True:
-            ss = self.Cmd.p.stdout.read(1)
-            if self.Cmd.p.poll() != None:
-                self.Cmd.block.acquire()
-                s = "\nConsole process was terminated."
-                self.Cmd.add_output(s)
-                self.Cmd.block.release()
-                break
-            if ss != '':      
-                self.Cmd.block.acquire()
-                s = (ss).decode("cp1251")
-                self.Cmd.add_output(s)
-                self.Cmd.block.release()
+        try:
+            while True:
+                ss = self.Cmd.p.stdout.read(1)
+                if self.Cmd.p.poll() != None:
+                    s = "\nConsole process was terminated."
+                    self.Cmd.block.acquire()
+                    self.Cmd.add_output(s)
+                    self.Cmd.block.release()
+                    break
+                if ss != '':  
+                    s = ss.decode("cp866")
+                    self.Cmd.block.acquire()
+                    self.Cmd.add_output(s)
+                    self.Cmd.block.release()
+                    sys.stderr.write(s)
+                    sys.stderr.flush()
+        except e:
+            sys.stderr.write(str(e))
+            sys.stderr.flush()
+            self.Cmd.block.release()
     
 
 class Command:
@@ -188,7 +195,7 @@ class Command:
         except:
             pass
             
-        self.history += [text] 
+        self.history += [text]
         self.p.stdin.write((text+'\r\n').encode("cp1251"))
         self.p.stdin.flush()
         print('run:', text)
