@@ -3,11 +3,33 @@ import os
 from cudatext import *
 import cudatext_keys as keys
 from subprocess import Popen, PIPE, STDOUT
+from time import sleep
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
+<<<<<<< HEAD
+DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash' 
+
+from threading import Thread,Lock
+class ControlTh(Thread):
+    def __init__(self,Cmd):
+        Thread.__init__(self)
+        self.Cmd=Cmd
+    def run(self):
+        while True:
+            ss=self.Cmd.p.stdout.read(1)
+            self.Cmd.block.acquire()
+            s=ss.decode("cp1251")
+            self.Cmd.add_output(s)
+            if s=='>':
+                self.Cmd.block.release()
+                return
+            self.Cmd.block.release()
+            
+=======
 DEF_SHELL = r'%windir%\system32\cmd.exe' if os.name=='nt' else 'bash' 
+>>>>>>> 8a39475b061584e970a037f345e29753b4499d90
 
 
 class Command:
@@ -42,8 +64,8 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(18) ]
         self.menu_calls += [ lambda: self.run_cmd_n(19) ]
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
-    
-            
+
+
     def open(self):
     
         self.title = 'Terminal'
@@ -52,13 +74,17 @@ class Command:
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
 
         timer_proc(TIMER_START, self.timer_update, 150, tag="")
+        self.block = Lock()
         self.p = Popen(
-            os.path.expandvars(self.shell_path),
-            #stdin = , 
+            os.path.expandvars('%windir%\system32\cmd'),
+            stdin = PIPE, 
             stdout = PIPE, 
             stderr = STDOUT, 
-            shell = True
+            shell = True,bufsize = 0
             )
+        self.block.acquire()
+        self.CtlTh=ControlTh(self)
+        self.CtlTh.start()
         self.s = ''
                 
 
@@ -115,15 +141,20 @@ class Command:
 
 
     def timer_update(self, tag='', info=''):
+        self.block.release()
+        '''#ss = self.p.stdin.write('exit')    
+        ss = self.p.stdin.flush()
         ss = self.p.stdout.read()
-        try:
-            s = ss.decode()
-        except:
-            s = ss.decode("cp1251")
+        #try:
+            #s = ss.decode()
+        #except:
+        s = ss.decode("cp1251")
         if not s:
             return
             
-        self.add_output(s)
+        self.add_output(s)'''
+        sleep(0.01)
+        self.block.acquire()
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
@@ -167,7 +198,11 @@ class Command:
         except:
             pass
             
-        self.history += [text]    
+        self.history += [text] 
+        self.p.stdin.write((text+'/n').encode("cp1251"))
+        self.CtlTh=ControlTh(self)
+        self.CtlTh.start()
+        #self.p.stdin.flush()
         print('run:', text)
 
 
@@ -185,5 +220,5 @@ class Command:
         
         n = self.memo.get_line_count()-1
         line = self.memo.get_text_line(n)
-        self.memo.set_caret(len(line), n)
+        self.memo.set_caret(len(line),n)
         
