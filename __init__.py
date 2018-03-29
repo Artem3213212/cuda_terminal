@@ -91,18 +91,22 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(18) ]
         self.menu_calls += [ lambda: self.run_cmd_n(19) ]
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
-        self.p=None
-        timer_proc(TIMER_START, self.timer_update, 150, tag="")
+        self.menu_calls += [ lambda: self.run_cmd_n(21) ]
+        
         self.title = 'Terminal'
         self.h_dlg = self.init_form()
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
-        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+        self.p = None
         self.block = Lock()
         self.block.acquire()
-        self.btext=b''
+        self.btext = b''
+        timer_proc(TIMER_START, self.timer_update, 200, tag='')
 
 
     def open(self):
+    
+        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+        
         if self.p == None:
             self.p = Popen(
                 os.path.expandvars(self.shell_path),
@@ -242,6 +246,7 @@ class Command:
         
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
+
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
@@ -249,6 +254,8 @@ class Command:
         
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
-    def Exit(self, s):
-        if self.p == None:
+
+    def exit(self, s):
+    
+        if self.p != None:
             self.p.stdout.write('exit\n')
