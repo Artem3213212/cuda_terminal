@@ -9,14 +9,15 @@ fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
 DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash'
+CODE_TABLE = 'cp866' if os.name=='nt' else 'utf8'
+syms='\n'+'abcdefghijklmnopqrstuvwxyz'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+r'''<>\/"^@!()#&-+=_~|.,[]{};:?%'$'''+'\r'
 
-sys.stderr=open('1.log', 'w', buffering = 1)
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
     def run(self):
-        try:
+        if os.name!='nt':
             while True:
                 ss = self.Cmd.p.stdout.read(1)
                 if self.Cmd.p.poll() != None:
@@ -25,17 +26,29 @@ class ControlTh(Thread):
                     self.Cmd.add_output(s)
                     self.Cmd.block.release()
                     break
-                if ss != '':  
-                    s = ss.decode("cp866")
+                if ss != '':
+                    s = ss.decode(CODE_TABLE)
                     self.Cmd.block.acquire()
                     self.Cmd.add_output(s)
                     self.Cmd.block.release()
-                    sys.stderr.write(s)
-                    sys.stderr.flush()
-        except e:
-            sys.stderr.write(str(e))
-            sys.stderr.flush()
-            self.Cmd.block.release()
+        else:
+            while True:
+                pp1 = self.Cmd.p.stdout.tell()
+                self.Cmd.p.stdout.seek(0, 2)
+                pp2 = self.Cmd.p.stdout.tell()
+                self.Cmd.p.stdout.seek(pp1)
+                if self.Cmd.p.poll() != None:
+                    s = "\nConsole process was terminated."
+                    self.Cmd.block.acquire()
+                    self.Cmd.add_output(s)
+                    self.Cmd.block.release()
+                    break
+                if pp1!=pp2:
+                    ss = self.Cmd.p.stdout.read(pp2-pp1)
+                    s = ss.decode(CODE_TABLE)
+                    self.Cmd.block.acquire()
+                    self.Cmd.add_output(s)
+                    self.Cmd.block.release()
     
 
 class Command:
@@ -196,7 +209,7 @@ class Command:
             pass
             
         self.history += [text]
-        self.p.stdin.write((text+'\r\n').encode("cp1251"))
+        self.p.stdin.write((text+'\r\n').encode(CODE_TABLE))
         self.p.stdin.flush()
         print('run:', text)
 
@@ -207,7 +220,6 @@ class Command:
         
         
     def add_output(self, s):
-    
         self.memo.set_prop(PROP_RO, False)
         text = self.memo.get_text_all()
         self.memo.set_text_all(text+s)
