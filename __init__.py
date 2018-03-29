@@ -274,6 +274,13 @@ class Command:
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
         if self.p != None:
-            self.p.send_signal(signal.SIGTERM)
-            sleep(0.5)
+            #self.p.send_signal(signal.SIGTERM)
+            self.p.stdin.write(b'exit\n')
+            self.p.stdin.flush()
+            sleep(0.1)
 
+            self.block.release()
+            sleep(0.1)
+
+            print('closing terminal')
+            
