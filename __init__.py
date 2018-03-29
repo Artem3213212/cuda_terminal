@@ -269,9 +269,9 @@ class Command:
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
 
-    def on_exit(self):
+    def on_exit(self, ed_self):
 
-        timer_proc(TIMER_STOP, self.timer_update)
+        timer_proc(TIMER_STOP, self.timer_update, 0)
 
         if self.p != None:
             self.p.send_signal(signal.SIGTERM)
