@@ -156,11 +156,15 @@ class Command:
         self.memo.set_prop(PROP_RO, True)
         self.memo.set_prop(PROP_CARET_VIRTUAL, False)
         self.memo.set_prop(PROP_GUTTER_ALL, False)
+        self.memo.set_prop(PROP_UNPRINTED_SHOW, False)
+        self.memo.set_prop(PROP_MARGIN, 2000)
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
         
         self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
+        self.input.set_prop(PROP_UNPRINTED_SHOW, False)
+        self.input.set_prop(PROP_MARGIN, 2000)
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
         
