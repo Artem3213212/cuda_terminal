@@ -218,7 +218,7 @@ class Command:
         self.history += [text]
         self.p.stdin.write((text+'\n').encode(CODE_TABLE))
         self.p.stdin.flush()
-        print('run:', text)
+        #print('run:', text)
 
 
     def run_cmd_n(self, n):
