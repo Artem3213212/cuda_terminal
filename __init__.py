@@ -21,10 +21,11 @@ class ControlTh(Thread):
             while True:
                 s = self.Cmd.p.stdout.read(1)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated.".encode(CODE_TABLE)
+                    s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
                     self.Cmd.block.acquire()
                     self.Cmd.btextchanged = True
                     self.Cmd.btext=self.Cmd.btext+s
+                    self.Cmd.p=None
                     self.Cmd.block.release()
                     break
                 if s != '':
@@ -39,10 +40,11 @@ class ControlTh(Thread):
                 pp2 = self.Cmd.p.stdout.tell()
                 self.Cmd.p.stdout.seek(pp1)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated.".encode(CODE_TABLE)
+                    s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
                     self.Cmd.block.acquire()
                     self.Cmd.btextchanged = True
                     self.Cmd.btext=self.Cmd.btext+s
+                    self.Cmd.p=None
                     self.Cmd.block.release()
                     break
                 if pp2!=pp1:
@@ -51,7 +53,7 @@ class ControlTh(Thread):
                     self.Cmd.btextchanged = True
                     self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
-                sleep(0.1)
+                sleep(0.02)
     
 
 class Command:
@@ -89,32 +91,33 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(18) ]
         self.menu_calls += [ lambda: self.run_cmd_n(19) ]
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
-
-
-    def open(self):
-    
+        self.p=None
+        timer_proc(TIMER_START, self.timer_update, 150, tag="")
         self.title = 'Terminal'
         self.h_dlg = self.init_form()
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-
-        timer_proc(TIMER_START, self.timer_update, 150, tag="")
-        #w,self.r=os.pipe()
         self.block = Lock()
-        self.p = Popen(
-            os.path.expandvars(self.shell_path),
-            stdin = PIPE,
-            stdout = PIPE,
-            stderr = STDOUT,
-            shell = True,
-            bufsize = 0
-            )
         self.block.acquire()
-        self.p.stdin.flush()
-        self.CtlTh=ControlTh(self)
-        self.CtlTh.start()
-        self.s = ''
         self.btext=b''
+
+
+    def open(self):
+        if self.p == None:
+            self.p = Popen(
+                os.path.expandvars(self.shell_path),
+                stdin = PIPE,
+                stdout = PIPE,
+                stderr = STDOUT,
+                shell = True,
+                bufsize = 0
+                )
+
+            #w,self.r=os.pipe()
+            self.p.stdin.flush()
+            self.CtlTh=ControlTh(self)
+            self.CtlTh.start()
+            self.s = ''
                 
 
     def init_form(self):
@@ -173,7 +176,7 @@ class Command:
     def timer_update(self, tag='', info=''):
         self.btextchanged = False
         self.block.release()
-        sleep(0.01)
+        sleep(0.03)
         self.block.acquire()
         if self.btextchanged:
             self.update_output(self.btext.decode(CODE_TABLE))
@@ -220,9 +223,10 @@ class Command:
             pass
             
         self.history += [text]
-        self.p.stdin.write((text+'\n').encode(CODE_TABLE))
-        self.p.stdin.flush()
-        #print('run:', text)
+        
+        if self.p != None: 
+            self.p.stdin.write((text+'\n').encode(CODE_TABLE))
+            self.p.stdin.flush()
 
 
     def run_cmd_n(self, n):
@@ -244,3 +248,7 @@ class Command:
         self.memo.set_prop(PROP_RO, True)
         
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
+
+    def Exit(self, s):
+        if self.p == None:
+            self.p.stdout.write('exit\n')
