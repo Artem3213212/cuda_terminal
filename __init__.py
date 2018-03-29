@@ -1,35 +1,35 @@
-import sys
-import os
+import sys,os
 from cudatext import *
 import cudatext_keys as keys
 from subprocess import Popen, PIPE, STDOUT
-from threading import Thread, Lock
+from threading import Thread, Lock, active_count
 from time import sleep
+
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
 DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash'
 CODE_TABLE = 'cp866' if os.name=='nt' else 'utf8'
-syms='\n'+'abcdefghijklmnopqrstuvwxyz'+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+r'''<>\/"^@!()#&-+=_~|.,[]{};:?%'$'''+'\r'
 
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
     def run(self):
-        if os.name!='nt':
+        if os.name != 'nt':
             while True:
-                ss = self.Cmd.p.stdout.read(1)
+                s = self.Cmd.p.stdout.read(1)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated."
+                    s = "\nConsole process was terminated.".encode(CODE_TABLE)
                     self.Cmd.block.acquire()
-                    self.Cmd.add_output(s)
+                    self.Cmd.btextchanged = True
+                    self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
                     break
-                if ss != '':
-                    s = ss.decode(CODE_TABLE)
+                if s != '':
                     self.Cmd.block.acquire()
-                    self.Cmd.add_output(s)
+                    self.Cmd.btextchanged = True
+                    self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
         else:
             while True:
@@ -38,23 +38,25 @@ class ControlTh(Thread):
                 pp2 = self.Cmd.p.stdout.tell()
                 self.Cmd.p.stdout.seek(pp1)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated."
+                    s = "\nConsole process was terminated.".encode(CODE_TABLE)
                     self.Cmd.block.acquire()
-                    self.Cmd.add_output(s)
+                    self.Cmd.btextchanged = True
+                    self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
                     break
-                if pp1!=pp2:
-                    ss = self.Cmd.p.stdout.read(pp2-pp1)
-                    s = ss.decode(CODE_TABLE)
+                if pp2!=pp1:
+                    s = self.Cmd.p.stdout.read(pp2-pp1)
                     self.Cmd.block.acquire()
-                    self.Cmd.add_output(s)
+                    self.Cmd.btextchanged = True
+                    self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
+                sleep(0.1)
     
 
 class Command:
 
     def __init__(self):
-
+    
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
@@ -93,6 +95,7 @@ class Command:
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
 
         timer_proc(TIMER_START, self.timer_update, 150, tag="")
+        #w,self.r=os.pipe()
         self.block = Lock()
         self.p = Popen(
             os.path.expandvars(self.shell_path),
@@ -107,6 +110,7 @@ class Command:
         self.CtlTh=ControlTh(self)
         self.CtlTh.start()
         self.s = ''
+        self.btext=b''
                 
 
     def init_form(self):
@@ -162,9 +166,12 @@ class Command:
 
 
     def timer_update(self, tag='', info=''):
+        self.btextchanged = False
         self.block.release()
         sleep(0.01)
         self.block.acquire()
+        if self.btextchanged:
+            self.update_output(self.btext.decode(CODE_TABLE))
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
@@ -196,7 +203,6 @@ class Command:
         x, y = dlg_proc(self.h_dlg, DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
         menu_proc(self.h_menu, MENU_SHOW, command=(x, y))
         
-        
     def run_cmd(self, text):
 
         while len(self.history) > MAX_HISTORY:
@@ -209,7 +215,7 @@ class Command:
             pass
             
         self.history += [text]
-        self.p.stdin.write((text+'\r\n').encode(CODE_TABLE))
+        self.p.stdin.write((text+'\n').encode(CODE_TABLE))
         self.p.stdin.flush()
         print('run:', text)
 
@@ -223,6 +229,14 @@ class Command:
         self.memo.set_prop(PROP_RO, False)
         text = self.memo.get_text_all()
         self.memo.set_text_all(text+s)
+        self.memo.set_prop(PROP_RO, True)
+        
+        n = self.memo.get_line_count()-1
+        line = self.memo.get_text_line(n)
+        self.memo.set_caret(len(line),n)
+    def update_output(self, s):
+        self.memo.set_prop(PROP_RO, False)
+        self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
         
         n = self.memo.get_line_count()-1
