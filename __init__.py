@@ -58,6 +58,9 @@ class Command:
 
     def __init__(self):
     
+        global CODE_TABLE
+        CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
+    
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
@@ -159,6 +162,7 @@ class Command:
 
     def config(self):
 
+        ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'colors', 'back', hex(self.color_back))
         ini_write(fn_config, 'colors', 'font', hex(self.color_font))
