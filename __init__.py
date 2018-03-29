@@ -188,16 +188,23 @@ class Command:
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
     
-        if id_ctl==13: #Enter
+        #Enter
+        if id_ctl==13:
             text = self.input.get_text_line(0)
             self.input.set_text_all('')
             self.input.set_caret(0, 0)
             self.run_cmd(text)
             return False
-            
+
+        #history menu            
         if (id_ctl==keys.VK_DOWN):
             self.show_history()
             return False
+            
+        #Escape: send Ctrl+C
+        if (id_ctl==keys.VK_ESCAPE) and (data==''):
+            self.p.stdin.write(b'\x03\x10')
+            self.p.stdin.flush()
             
 
     def show_history(self):
@@ -211,9 +218,10 @@ class Command:
                 )
                 
         prop = dlg_proc(self.h_dlg, DLG_CTL_PROP_GET, name='input')
-        x, y = prop['x'] + prop['w'], prop['y']
+        x, y = prop['x'], prop['y']
         x, y = dlg_proc(self.h_dlg, DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
         menu_proc(self.h_menu, MENU_SHOW, command=(x, y))
+
         
     def run_cmd(self, text):
 
