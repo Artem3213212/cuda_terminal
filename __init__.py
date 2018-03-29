@@ -1,6 +1,7 @@
 import sys,os
 from cudatext import *
 import cudatext_keys as keys
+import cudatext_cmd as cmds
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
@@ -231,14 +232,11 @@ class Command:
         self.memo.set_text_all(text+s)
         self.memo.set_prop(PROP_RO, True)
         
-        n = self.memo.get_line_count()-1
-        line = self.memo.get_text_line(n)
-        self.memo.set_caret(len(line),n)
+        self.memo.cmd(cmds.cCommand_GotoTextEnd)
+
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
         
-        n = self.memo.get_line_count()-1
-        line = self.memo.get_text_line(n)
-        self.memo.set_caret(len(line),n)
+        self.memo.cmd(cmds.cCommand_GotoTextEnd)
