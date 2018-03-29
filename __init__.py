@@ -1,10 +1,12 @@
-import sys,os
+import sys
+import os
 from cudatext import *
 import cudatext_keys as keys
 import cudatext_cmd as cmds
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
+import signal
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
@@ -54,21 +56,21 @@ class ControlTh(Thread):
                     self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
                 sleep(0.02)
-    
+
 
 class Command:
 
     def __init__(self):
-    
+
         global CODE_TABLE
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
-    
+
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
-        
+
         self.menu_calls = []
         self.menu_calls += [ lambda: self.run_cmd_n(0) ]
         self.menu_calls += [ lambda: self.run_cmd_n(1) ]
@@ -92,7 +94,7 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(19) ]
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
         self.menu_calls += [ lambda: self.run_cmd_n(21) ]
-        
+
         self.title = 'Terminal'
         self.h_dlg = self.init_form()
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
@@ -104,9 +106,9 @@ class Command:
 
 
     def open(self):
-    
+
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-        
+
         if self.p == None:
             self.p = Popen(
                 os.path.expandvars(self.shell_path),
@@ -122,37 +124,37 @@ class Command:
             self.CtlTh=ControlTh(self)
             self.CtlTh.start()
             self.s = ''
-                
+
 
     def init_form(self):
-    
+
         h = dlg_proc(0, DLG_CREATE)
         dlg_proc(h, DLG_PROP_SET, prop={
             'border': False,
             'keypreview': True,
             'on_key_down': self.form_key_down,
             })
-        
+
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         nn = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        
+
         self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=nn))
-        
+
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'memo',
             'align': ALIGN_CLIENT,
             })
-        
+
         dlg_proc(h, DLG_CTL_PROP_SET, index=nn, prop={
             'name': 'input',
             'border': True,
             'align': ALIGN_BOTTOM,
             'h': 25,
             })
-            
+
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
-        
+
         self.memo.set_prop(PROP_RO, True)
         self.memo.set_prop(PROP_CARET_VIRTUAL, False)
         self.memo.set_prop(PROP_GUTTER_ALL, False)
@@ -160,14 +162,14 @@ class Command:
         self.memo.set_prop(PROP_MARGIN, 2000)
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
-        
+
         self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
         self.input.set_prop(PROP_UNPRINTED_SHOW, False)
         self.input.set_prop(PROP_MARGIN, 2000)
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
-        
+
         return h
 
 
@@ -177,7 +179,7 @@ class Command:
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'colors', 'back', hex(self.color_back))
         ini_write(fn_config, 'colors', 'font', hex(self.color_font))
-        
+
         file_open(fn_config)
 
 
@@ -191,7 +193,7 @@ class Command:
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
-    
+
         #Enter
         if id_ctl==13:
             text = self.input.get_text_line(0)
@@ -200,33 +202,33 @@ class Command:
             self.run_cmd(text)
             return False
 
-        #history menu            
+        #history menu
         if (id_ctl==keys.VK_DOWN):
             self.show_history()
             return False
-            
+
         #Escape: send Ctrl+C
         if (id_ctl==keys.VK_ESCAPE) and (data==''):
             self.p.stdin.write(b'\x03\x10')
             self.p.stdin.flush()
-            
+
 
     def show_history(self):
-    
+
         menu_proc(self.h_menu, MENU_CLEAR)
         for (index, item) in enumerate(self.history):
-            menu_proc(self.h_menu, MENU_ADD, 
-                index=0, 
-                caption=item, 
+            menu_proc(self.h_menu, MENU_ADD,
+                index=0,
+                caption=item,
                 command=self.menu_calls[index],
                 )
-                
+
         prop = dlg_proc(self.h_dlg, DLG_CTL_PROP_GET, name='input')
         x, y = prop['x'], prop['y']
         x, y = dlg_proc(self.h_dlg, DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
         menu_proc(self.h_menu, MENU_SHOW, command=(x, y))
 
-        
+
     def run_cmd(self, text):
 
         while len(self.history) > MAX_HISTORY:
@@ -237,25 +239,25 @@ class Command:
             del self.history[n]
         except:
             pass
-            
+
         self.history += [text]
-        
-        if self.p != None: 
+
+        if self.p != None:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
 
 
     def run_cmd_n(self, n):
-    
-        self.run_cmd(self.history[n])        
-        
-        
+
+        self.run_cmd(self.history[n])
+
+
     def add_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         text = self.memo.get_text_all()
         self.memo.set_text_all(text+s)
         self.memo.set_prop(PROP_RO, True)
-        
+
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
 
@@ -263,11 +265,15 @@ class Command:
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
-        
+
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
 
-    def exit(self, s):
-    
+    def on_exit(self):
+
+        timer_proc(TIMER_STOP, self.timer_update)
+
         if self.p != None:
-            self.p.stdout.write('exit\n')
+            self.p.send_signal(signal.SIGTERM)
+            sleep(0.5)
+
