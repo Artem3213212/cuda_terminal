@@ -7,7 +7,7 @@ from cudax_lib import int_to_html_color, html_color_to_int
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
-from signal import CTRL_C_EVENT
+from signal import SIGTERM
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
@@ -316,9 +316,7 @@ class Command:
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
         if self.p != None:
-            self.p.send_signal(CTRL_C_EVENT)
-            #sleep(0.1)
-
+            self.p.send_signal(SIGTERM)
             self.block.release()
             sleep(0.25)
 
@@ -326,8 +324,9 @@ class Command:
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
     
         try:
-          self.p.send_signal(CTRL_C_EVENT)
+          self.p.send_signal(SIGTERM)
         except:
           pass
+        self.p.wait()
         self.timer_update()
         self.open()
