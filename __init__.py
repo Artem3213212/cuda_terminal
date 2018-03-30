@@ -225,11 +225,11 @@ class Command:
             self.show_history()
             return False
 
-        #Escape: send Ctrl+C
+        #Escape: go to editor
         if (id_ctl==keys.VK_ESCAPE) and (data==''):
-            self.p.stdin.write(b'\x03\x10')
-            self.p.stdin.flush()
-
+            ed.focus()
+            ed.cmd(cmds.cmd_ToggleBottomPanel)
+    
 
     def show_history(self):
 
