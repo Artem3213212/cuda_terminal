@@ -119,7 +119,6 @@ class Command:
     def open(self):
 
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-        dlg_proc(self.h_dlg, DLG_FOCUS)
 
         if self.p == None:
             self.p = Popen(
@@ -313,13 +312,12 @@ class Command:
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
         if self.p != None:
-            #self.p.send_signal(signal.SIGTERM)
             self.p.stdin.write(b'exit\n')
             self.p.stdin.flush()
-            sleep(0.1)
+            #sleep(0.1)
 
             self.block.release()
-            sleep(0.3)
+            sleep(0.25)
 
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
