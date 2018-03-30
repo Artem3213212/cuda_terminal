@@ -154,32 +154,24 @@ class Command:
             'align': ALIGN_CLIENT,
             })
 
-        n = dlg_proc(h, DLG_CTL_ADD, 'panel')
-        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'btm',
-            'border': False,
-            'align': ALIGN_BOTTOM,
-            'h': 25,
-            })
-
-        n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
-        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'break',
-            'p': 'btm',
-            'align': ALIGN_RIGHT,
-            'w': 90,
-            'cap': 'Break',
-            'hint': 'Hotkey: Break',
-            'on_change': self.button_break_click,
-            })
-
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'input',
             'border': True,
-            'p': 'btm',
-            'align': ALIGN_CLIENT,
+            'align': ALIGN_BOTTOM,
+            'h': 26,
+            })
+
+        n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'break',
+            'p': 'input',
+            'align': ALIGN_RIGHT,
+            'w': 90,
+            'cap': 'Break',
+            'hint': 'Hotkey: Break',
+            'on_change': self.button_break_click,
             })
 
         self.memo.set_prop(PROP_RO, True)
