@@ -11,15 +11,16 @@ import signal
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
-DEF_SHELL = r'%windir%\system32\cmd' if os.name=='nt' else 'bash'
-CODE_TABLE = 'cp866' if os.name=='nt' else 'utf8'
+IS_WIN = os.name=='nt'
+DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
+CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
     def run(self):
-        if os.name != 'nt':
+        if not IS_WIN:
             while True:
                 s = self.Cmd.p.stdout.read(1)
                 if self.Cmd.p.poll() != None:
