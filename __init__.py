@@ -3,6 +3,7 @@ import os
 from cudatext import *
 import cudatext_keys as keys
 import cudatext_cmd as cmds
+from cudax_lib import int_to_html_color, html_color_to_int
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
@@ -82,8 +83,8 @@ class Command:
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
-        self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
-        self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
+        self.color_back = html_color_to_int(ini_read(fn_config, 'color', 'back', '#000'))
+        self.color_font = html_color_to_int(ini_read(fn_config, 'color', 'font', '#FFF'))
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
 
@@ -201,8 +202,8 @@ class Command:
         ini_write(fn_config, 'op', 'prompt', PROMPT)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
-        ini_write(fn_config, 'colors', 'back', hex(self.color_back))
-        ini_write(fn_config, 'colors', 'font', hex(self.color_font))
+        ini_write(fn_config, 'color', 'back', int_to_html_color(self.color_back))
+        ini_write(fn_config, 'color', 'font', int_to_html_color(self.color_font))
 
         file_open(fn_config)
 
