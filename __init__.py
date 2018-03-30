@@ -311,9 +311,8 @@ class Command:
 
 
     def on_exit(self, ed_self):
-
+        self.button_break_click()
         timer_proc(TIMER_STOP, self.timer_update, 0)
-
         if self.p != None:
             self.p.stdin.write(b'exit\n')
             self.p.stdin.flush()
