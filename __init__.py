@@ -135,7 +135,6 @@ class Command:
             self.p.stdin.flush()
             self.CtlTh=ControlTh(self)
             self.CtlTh.start()
-            self.s = ''
 
 
     def init_form(self):
@@ -324,9 +323,10 @@ class Command:
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
     
         try:
-          self.p.send_signal(SIGTERM)
+            self.p.send_signal(SIGTERM)
         except:
-          pass
-        self.p.wait()
+            pass  
+        self.p.wait()          
+        sleep(0.2)
         self.timer_update()
         self.open()
