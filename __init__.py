@@ -77,8 +77,8 @@ class Command:
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
-        self.color_back = html_color_to_int(ini_read(fn_config, 'color', 'back', '#000'))
-        self.color_font = html_color_to_int(ini_read(fn_config, 'color', 'font', '#FFF'))
+        self.color_back = html_color_to_int(ini_read(fn_config, 'color', 'back', '#555'))
+        self.color_font = html_color_to_int(ini_read(fn_config, 'color', 'font', '#eee'))
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
 
