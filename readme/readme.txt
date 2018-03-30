@@ -6,7 +6,9 @@ Currently no command prompt of shell is shown, and no colors are shown.
 
 Plugin has several options in .ini file - call menu item Options/ Settings-plugins/ Terminal/ Config.
 
-In the input field, arrow-down key shows menu of last entered commands.
+Hotkeys in the inpit/memo field:
+- arrow down: Show commands history menu
+- Esc: close Terminal and focus editor
 
 
 License: MIT
