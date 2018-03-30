@@ -326,7 +326,7 @@ class Command:
             self.p.send_signal(SIGTERM)
         except:
             pass  
-        self.p.wait()          
-        sleep(0.2)
-        self.timer_update()
+        self.p.wait()
+        while self.p!=None:
+            self.timer_update()
         self.open()
