@@ -77,6 +77,7 @@ class Command:
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
+        self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
         self.color_back = html_color_to_int(ini_read(fn_config, 'color', 'back', '#555'))
         self.color_font = html_color_to_int(ini_read(fn_config, 'color', 'font', '#eee'))
         self.history = []
@@ -151,6 +152,7 @@ class Command:
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'memo',
             'align': ALIGN_CLIENT,
+            'font_size': self.font_size,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
@@ -159,6 +161,7 @@ class Command:
             'name': 'input',
             'border': True,
             'align': ALIGN_BOTTOM,
+            'font_size': self.font_size,
             'h': 26,
             })
 
@@ -205,6 +208,7 @@ class Command:
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
+        ini_write(fn_config, 'op', 'font_size', str(self.font_size))
         ini_write(fn_config, 'color', 'back', int_to_html_color(self.color_back))
         ini_write(fn_config, 'color', 'font', int_to_html_color(self.color_font))
 
