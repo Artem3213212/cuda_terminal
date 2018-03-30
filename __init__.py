@@ -308,7 +308,4 @@ class Command:
             sleep(0.1)
 
             self.block.release()
-            sleep(0.1)
-
-            #print('closing terminal')
-            
+            sleep(0.3)
