@@ -16,6 +16,11 @@ DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 
+def bool_to_str(v):
+    return '1' if v else '0'
+def str_to_bool(s):
+    return s=='1'
+
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
@@ -68,7 +73,7 @@ class Command:
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
-        self.add_prompt = ini_read(fn_config, 'op', 'add_prompt', '1' if DEF_ADD_PROMPT else '0')=='1'
+        self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
         self.history = []
@@ -186,7 +191,7 @@ class Command:
 
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
-        ini_write(fn_config, 'op', 'add_prompt', '1' if self.add_prompt else '0')
+        ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'colors', 'back', hex(self.color_back))
         ini_write(fn_config, 'colors', 'font', hex(self.color_font))
 
