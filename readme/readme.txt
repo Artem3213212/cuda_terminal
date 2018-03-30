@@ -3,9 +3,10 @@ Adds panel "Terminal" to the bottom panel of CudaText. It is emulation of termin
 
 Plugin has several options in .ini file - call menu item Options/ Settings-plugins/ Terminal/ Config.
 
+In the input field, arrow-down key shows menu of last entered commands.
+
 
 License: MIT
 Authors:
   Alexey (CudaText)
-  Artem Gavrilov
-  Vladislav Utkin
+  Artem Gavrilov (@Artem3213212)
