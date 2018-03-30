@@ -16,7 +16,7 @@ IS_WIN = os.name=='nt'
 DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
-PROMPT = '{dir}> '
+BASH_PROMPT = 'echo [`pwd`]$ '
 
 def bool_to_str(v):
     return '1' if v else '0'
@@ -24,11 +24,6 @@ def bool_to_str(v):
 def str_to_bool(s):
     return s=='1'
     
-def get_prompt():
-    s = PROMPT
-    s = s.replace('{dir}', os.getcwd())
-    return s
-
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
@@ -77,9 +72,8 @@ class Command:
 
     def __init__(self):
 
-        global CODE_TABLE, PROMPT
+        global CODE_TABLE
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
-        PROMPT = ini_read(fn_config, 'op', 'prompt', PROMPT)
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
@@ -199,7 +193,6 @@ class Command:
     def config(self):
 
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
-        ini_write(fn_config, 'op', 'prompt', PROMPT)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'color', 'back', int_to_html_color(self.color_back))
@@ -267,9 +260,9 @@ class Command:
 
         self.history += [text]
         
-        if self.add_prompt:
-            self.btext += ('\n'+get_prompt()+text+'\n').encode(CODE_TABLE)
-            self.update_output(self.btext.decode(CODE_TABLE))
+        if self.add_prompt and not IS_WIN:
+            self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
+            self.p.stdin.flush()
 
         if self.p != None:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
