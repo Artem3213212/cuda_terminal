@@ -119,6 +119,7 @@ class Command:
     def open(self):
 
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+        dlg_proc(self.h_dlg, DLG_FOCUS)
 
         if self.p == None:
             self.p = Popen(
@@ -147,24 +148,39 @@ class Command:
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        nn = dlg_proc(h, DLG_CTL_ADD, 'editor')
-
         self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
-        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=nn))
-
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'memo',
             'align': ALIGN_CLIENT,
             })
 
-        dlg_proc(h, DLG_CTL_PROP_SET, index=nn, prop={
-            'name': 'input',
-            'border': True,
+        n = dlg_proc(h, DLG_CTL_ADD, 'panel')
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'btm',
+            'border': False,
             'align': ALIGN_BOTTOM,
             'h': 25,
             })
 
-        dlg_proc(h, DLG_CTL_FOCUS, name='input')
+        n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'break',
+            'p': 'btm',
+            'align': ALIGN_RIGHT,
+            'w': 90,
+            'cap': 'Break',
+            'hint': 'Hotkey: Break',
+            'on_change': self.button_break_click,
+            })
+
+        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
+        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'input',
+            'border': True,
+            'p': 'btm',
+            'align': ALIGN_CLIENT,
+            })
 
         self.memo.set_prop(PROP_RO, True)
         self.memo.set_prop(PROP_CARET_VIRTUAL, False)
@@ -188,6 +204,8 @@ class Command:
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
 
+        dlg_proc(h, DLG_CTL_FOCUS, name='input')
+        
         return h
 
 
@@ -230,6 +248,12 @@ class Command:
         if (id_ctl==keys.VK_ESCAPE) and (data==''):
             ed.focus()
             ed.cmd(cmds.cmd_ToggleBottomPanel)
+            return False
+            
+        #Break (cannot react to Ctrl+Break)
+        if (id_ctl==keys.VK_PAUSE):
+            self.button_break_click(0, 0)
+            return False
     
 
     def show_history(self):
@@ -304,3 +328,8 @@ class Command:
 
             self.block.release()
             sleep(0.3)
+
+
+    def button_break_click(self, id_dlg, id_ctl, data='', info=''):
+        
+        msg_box('break..', MB_OK)
