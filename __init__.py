@@ -13,6 +13,7 @@ fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
+DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 
 class ControlTh(Thread):
@@ -67,6 +68,7 @@ class Command:
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
+        self.add_prompt = ini_read(fn_config, 'op', 'add_prompt', '1' if DEF_ADD_PROMPT else '0')=='1'
         self.color_back = int(ini_read(fn_config, 'colors', 'back', '0x0'), 16)
         self.color_font = int(ini_read(fn_config, 'colors', 'font', '0xFFFFFF'), 16)
         self.history = []
@@ -184,6 +186,7 @@ class Command:
 
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
+        ini_write(fn_config, 'op', 'add_prompt', '1' if self.add_prompt else '0')
         ini_write(fn_config, 'colors', 'back', hex(self.color_back))
         ini_write(fn_config, 'colors', 'font', hex(self.color_font))
 
@@ -248,6 +251,10 @@ class Command:
             pass
 
         self.history += [text]
+        
+        if self.add_prompt:
+            self.btext += ('\n>>> '+text+'\n').encode(CODE_TABLE)
+            self.update_output(self.btext.decode(CODE_TABLE))
 
         if self.p != None:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
