@@ -160,6 +160,10 @@ class Command:
         self.memo.set_prop(PROP_GUTTER_ALL, False)
         self.memo.set_prop(PROP_UNPRINTED_SHOW, False)
         self.memo.set_prop(PROP_MARGIN, 2000)
+        self.memo.set_prop(PROP_LAST_LINE_ON_TOP, False)
+        self.memo.set_prop(PROP_HILITE_CUR_LINE, False)
+        self.memo.set_prop(PROP_HILITE_CUR_COL, False)
+        self.memo.set_prop(PROP_MODERN_SCROLLBAR, True)
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
 
@@ -167,6 +171,8 @@ class Command:
         self.input.set_prop(PROP_ONE_LINE, True)
         self.input.set_prop(PROP_UNPRINTED_SHOW, False)
         self.input.set_prop(PROP_MARGIN, 2000)
+        self.input.set_prop(PROP_HILITE_CUR_LINE, False)
+        self.input.set_prop(PROP_HILITE_CUR_COL, False)
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
         self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
 
@@ -282,5 +288,5 @@ class Command:
             self.block.release()
             sleep(0.1)
 
-            print('closing terminal')
+            #print('closing terminal')
             
