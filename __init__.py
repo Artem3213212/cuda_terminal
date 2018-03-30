@@ -311,11 +311,15 @@ class Command:
 
 
     def on_exit(self, ed_self):
-        self.button_break_click()
         timer_proc(TIMER_STOP, self.timer_update, 0)
         if self.p != None:
-            self.p.stdin.write(b'exit\n')
-            self.p.stdin.flush()
+            try:
+                self.p.send_signal(SIGTERM)
+            except:
+                pass  
+            self.p.wait()
+            while self.p!=None:
+                self.timer_update()
             self.block.release()
             sleep(0.25)
 
