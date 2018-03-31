@@ -334,11 +334,14 @@ class Command:
 
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
-    
-        try:
-            self.p.send_signal(SIGTERM)
-        except:
-            pass  
+        
+        if IS_WIN:
+            try:
+                self.p.send_signal(SIGTERM)
+            except:
+                pass  
+        else:
+            self.p.stdin.write(b'exit\n')
         self.p.wait()
         while self.p!=None:
             self.timer_update()
