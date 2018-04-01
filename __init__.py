@@ -127,7 +127,7 @@ class Command:
                 stdin = PIPE,
                 stdout = PIPE,
                 stderr = STDOUT,
-                shell = True,
+                shell = IS_WIN,
                 bufsize = 0
                 )
 
@@ -340,9 +340,14 @@ class Command:
                 self.p.send_signal(SIGTERM)
             except:
                 pass  
+            self.p.wait()
         else:
-            self.p.stdin.write(b'exit\n')
-        self.p.wait()
+            try:
+                self.p.send_signal(SIGTERM)
+            except:
+                pass
+                  
         while self.p!=None:
             self.timer_update()
         self.open()
+        
