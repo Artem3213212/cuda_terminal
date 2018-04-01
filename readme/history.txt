@@ -1,3 +1,6 @@
 
+2018.04.01
+- fixes for stability (some hangs on Break click)
+
 2018.03.30
 initial version
