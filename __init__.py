@@ -121,7 +121,7 @@ class Command:
 
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
 
-        if self.p == None:
+        if not self.p:
             self.p = Popen(
                 os.path.expandvars(self.shell_path),
                 stdin = PIPE,
@@ -283,7 +283,7 @@ class Command:
             self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
 
-        if self.p != None:
+        if self.p:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
 
@@ -313,18 +313,18 @@ class Command:
     def on_exit(self, ed_self):
         timer_proc(TIMER_STOP, self.timer_update, 0)
         if IS_WIN:
-            if self.p != None:
+            if self.p:
                 try:
                     self.p.send_signal(SIGTERM)
                 except:
                     pass  
                 self.p.wait()
-                while self.p!=None:
+                while self.p:
                     self.timer_update()
                 self.block.release()
                 sleep(0.25)
         else:
-            if self.p != None:
+            if self.p:
                 self.p.stdin.write(b'exit\n')
                 self.p.stdin.flush()
                 #sleep(0.1)
@@ -347,7 +347,7 @@ class Command:
             except:
                 pass
                   
-        while self.p!=None:
+        while self.p:
             self.timer_update()
         self.open()
         
