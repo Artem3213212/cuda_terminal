@@ -278,6 +278,7 @@ class Command:
             pass
 
         self.history += [text]
+        self.input.set_text_all('')
         
         if self.add_prompt and not IS_WIN:
             self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
