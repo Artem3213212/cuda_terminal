@@ -312,26 +312,20 @@ class Command:
 
 
     def on_exit(self, ed_self):
-        timer_proc(TIMER_STOP, self.timer_update, 0)
-        if IS_WIN:
-            if self.p:
-                try:
-                    self.p.send_signal(SIGTERM)
-                except:
-                    pass  
-                self.p.wait()
-                while self.p:
-                    self.timer_update()
-                self.block.release()
-                sleep(0.25)
-        else:
-            if self.p:
-                self.p.stdin.write(b'exit\n')
-                self.p.stdin.flush()
-                #sleep(0.1)
 
-                self.block.release()
-                sleep(0.25)
+        timer_proc(TIMER_STOP, self.timer_update, 0)
+        if not self.p: return
+        
+        try:
+            self.p.send_signal(SIGTERM)
+        except:
+            pass  
+        if IS_WIN:
+            self.p.wait()
+        while self.p:
+            self.timer_update()
+        self.block.release()
+        sleep(0.25)
 
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
