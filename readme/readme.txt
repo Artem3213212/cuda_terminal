@@ -10,7 +10,9 @@ Hotkeys in the terminal:
 - Break: interrupt/restart shell process
 
 
-License: MIT
 Authors:
   Alexey (CudaText)
   Artem Gavrilov (@Artem3213212)
+
+License: MIT
+Credits for icon: Github.com, MIT license
