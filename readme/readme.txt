@@ -9,10 +9,9 @@ Hotkeys in the terminal:
 - Esc: close terminal and focus editor
 - Break: interrupt/restart shell process
 
-
 Authors:
-  Alexey (CudaText)
-  Artem Gavrilov (@Artem3213212)
+- Alexey (CudaText)
+- Artem Gavrilov (@Artem3213212)
 
 License: MIT
 Credits for icon: Github.com, MIT license
