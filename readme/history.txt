@@ -1,4 +1,7 @@
 
+2018.04.03
++ support "sudo" commands (replacing "sudo" to "sudo --stdin")
+
 2018.04.01
 - fixes for stability (some hangs on Break click)
 
