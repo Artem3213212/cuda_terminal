@@ -267,6 +267,10 @@ class Command:
 
 
     def run_cmd(self, text):
+    
+        #del lead spaces
+        while text.startswith(' '):
+            text = text[1:]
 
         while len(self.history) > MAX_HISTORY:
             del self.history[0]
@@ -279,6 +283,10 @@ class Command:
 
         self.history += [text]
         self.input.set_text_all('')
+            
+        #support password input in sudo
+        if text.startswith('sudo '):
+            text = 'sudo --stdin '+text[5:]
         
         if self.add_prompt and not IS_WIN:
             self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
