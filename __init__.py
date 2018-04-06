@@ -285,17 +285,21 @@ class Command:
         self.input.set_text_all('')
             
         #support password input in sudo
-        if text.startswith('sudo '):
+        if not IS_WIN and text.startswith('sudo '):
             text = 'sudo --stdin '+text[5:]
+
+        #don't write prompt, if sudo asks for password
+        line = self.memo.get_text_line(self.memo.get_line_count()-1)
+        is_sudo = not IS_WIN and line.startswith('[sudo] ')
         
-        if self.add_prompt and not IS_WIN:
+        if self.add_prompt and not IS_WIN and not is_sudo:
             self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
 
         if self.p:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
-
+            
 
     def run_cmd_n(self, n):
 
