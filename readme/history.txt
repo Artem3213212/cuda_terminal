@@ -1,4 +1,7 @@
 
+2018.10.24
+- avoid deleted CudaText API
+
 2018.04.03
 + support "sudo" commands (replacing "sudo" to "sudo --stdin")
 
