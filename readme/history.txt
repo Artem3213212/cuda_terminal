@@ -1,4 +1,8 @@
 
+2019.08.30
+* used current app theme colors, deleted 2 color options
+- must hide minimap in terminal memo
+
 2018.10.24
 - avoid deleted CudaText API
 

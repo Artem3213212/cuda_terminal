@@ -3,7 +3,6 @@ import os
 from cudatext import *
 import cudatext_keys as keys
 import cudatext_cmd as cmds
-from cudax_lib import int_to_html_color, html_color_to_int
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
@@ -78,8 +77,6 @@ class Command:
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
-        self.color_back = html_color_to_int(ini_read(fn_config, 'color', 'back', '#555'))
-        self.color_font = html_color_to_int(ini_read(fn_config, 'color', 'font', '#eee'))
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
 
@@ -184,8 +181,8 @@ class Command:
         self.memo.set_prop(PROP_HILITE_CUR_LINE, False)
         self.memo.set_prop(PROP_HILITE_CUR_COL, False)
         self.memo.set_prop(PROP_MODERN_SCROLLBAR, True)
-        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
-        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
+        self.memo.set_prop(PROP_MINIMAP, False)
+        self.memo.set_prop(PROP_MICROMAP, False)
 
         self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
@@ -193,8 +190,6 @@ class Command:
         self.input.set_prop(PROP_MARGIN, 2000)
         self.input.set_prop(PROP_HILITE_CUR_LINE, False)
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
-        self.input.set_prop(PROP_COLOR, (COLOR_ID_TextFont, self.color_font))
-        self.input.set_prop(PROP_COLOR, (COLOR_ID_TextBg, self.color_back))
 
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
         
@@ -207,8 +202,6 @@ class Command:
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
-        ini_write(fn_config, 'color', 'back', int_to_html_color(self.color_back))
-        ini_write(fn_config, 'color', 'font', int_to_html_color(self.color_font))
 
         file_open(fn_config)
 
