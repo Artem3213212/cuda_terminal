@@ -1,4 +1,7 @@
 
+2019.08.31
++ on macOS, plugin appends to PATH several paths: /usr/local/bin, /usr/local/sbin, /opt/local/bin, /opt/local/sbin
+
 2019.08.30
 * used current app theme colors, deleted 2 color options
 - must hide minimap in terminal memo

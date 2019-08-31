@@ -12,6 +12,7 @@ fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
+IS_MAC = sys.platform=='darwin'
 DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
@@ -22,7 +23,7 @@ def bool_to_str(v):
 
 def str_to_bool(s):
     return s=='1'
-    
+
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
@@ -119,13 +120,18 @@ class Command:
         app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
 
         if not self.p:
+            env = os.environ
+            if IS_MAC:
+                env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
+
             self.p = Popen(
                 os.path.expandvars(self.shell_path),
                 stdin = PIPE,
                 stdout = PIPE,
                 stderr = STDOUT,
                 shell = IS_WIN,
-                bufsize = 0
+                bufsize = 0,
+                env = env
                 )
 
             #w,self.r=os.pipe()
@@ -192,7 +198,7 @@ class Command:
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
 
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
-        
+
         return h
 
 
@@ -235,12 +241,12 @@ class Command:
             ed.focus()
             ed.cmd(cmds.cmd_ToggleBottomPanel)
             return False
-            
+
         #Break (cannot react to Ctrl+Break)
         if (id_ctl==keys.VK_PAUSE):
             self.button_break_click(0, 0)
             return False
-    
+
 
     def show_history(self):
 
@@ -259,7 +265,7 @@ class Command:
 
 
     def run_cmd(self, text):
-    
+
         #del lead spaces
         while text.startswith(' '):
             text = text[1:]
@@ -275,7 +281,7 @@ class Command:
 
         self.history += [text]
         self.input.set_text_all('')
-            
+
         #support password input in sudo
         if not IS_WIN and text.startswith('sudo '):
             text = 'sudo --stdin '+text[5:]
@@ -283,7 +289,7 @@ class Command:
         #don't write prompt, if sudo asks for password
         line = self.memo.get_text_line(self.memo.get_line_count()-1)
         is_sudo = not IS_WIN and line.startswith('[sudo] ')
-        
+
         if self.add_prompt and not IS_WIN and not is_sudo:
             self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
@@ -291,7 +297,7 @@ class Command:
         if self.p:
             self.p.stdin.write((text+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
-            
+
 
     def run_cmd_n(self, n):
 
@@ -319,11 +325,11 @@ class Command:
 
         timer_proc(TIMER_STOP, self.timer_update, 0)
         if not self.p: return
-        
+
         try:
             self.p.send_signal(SIGTERM)
         except:
-            pass  
+            pass
         if IS_WIN:
             self.p.wait()
         while self.p:
@@ -333,20 +339,20 @@ class Command:
 
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
-        
+
         if IS_WIN:
             try:
                 self.p.send_signal(SIGTERM)
             except:
-                pass  
+                pass
             self.p.wait()
         else:
             try:
                 self.p.send_signal(SIGTERM)
             except:
                 pass
-                  
+
         while self.p:
             self.timer_update()
         self.open()
-        
+
