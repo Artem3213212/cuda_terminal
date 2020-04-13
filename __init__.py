@@ -1,12 +1,16 @@
-import sys
+import datetime
 import os
-from cudatext import *
+import sys
+
 import cudatext_keys as keys
 import cudatext_cmd as cmds
+
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread, Lock, active_count
 from time import sleep
 from signal import SIGTERM
+
+from cudatext import *
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
@@ -18,11 +22,22 @@ DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
 
+
+def log(s):
+    # Change conditional to True to log messages in a Debug process
+    if False:
+        now = datetime.datetime.now()
+        print(now.strftime("%H:%M:%S ") + s)
+    pass
+
+
 def bool_to_str(v):
     return '1' if v else '0'
 
+
 def str_to_bool(s):
     return s=='1'
+
 
 class ControlTh(Thread):
     def __init__(self, Cmd):
@@ -139,6 +154,8 @@ class Command:
             self.CtlTh=ControlTh(self)
             self.CtlTh.start()
 
+        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+
 
     def init_form(self):
 
@@ -147,6 +164,8 @@ class Command:
             'border': False,
             'keypreview': True,
             'on_key_down': self.form_key_down,
+            'on_show': self.form_show,
+            'on_hide': self.form_hide,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
@@ -213,6 +232,8 @@ class Command:
 
 
     def timer_update(self, tag='', info=''):
+
+        # log("Entering in timer_update")
         self.btextchanged = False
         self.block.release()
         sleep(0.03)
@@ -224,7 +245,7 @@ class Command:
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
 
         #Enter
-        if id_ctl==13:
+        if id_ctl==keys.VK_ENTER:
             text = self.input.get_text_line(0)
             self.input.set_text_all('')
             self.input.set_caret(0, 0)
@@ -238,6 +259,8 @@ class Command:
 
         #Escape: go to editor
         if (id_ctl==keys.VK_ESCAPE) and (data==''):
+            # Stops the timer
+            timer_proc(TIMER_STOP, self.timer_update, 0)
             ed.focus()
             ed.cmd(cmds.cmd_ToggleBottomPanel)
             return False
@@ -246,6 +269,17 @@ class Command:
         if (id_ctl==keys.VK_PAUSE):
             self.button_break_click(0, 0)
             return False
+
+
+    def form_hide(self, id_dlg, id_ctl, data='', info=''):
+        timer_proc(TIMER_STOP, self.timer_update, 0)
+        pass
+
+
+    def form_show(self, id_dlg, id_ctl, data='', info=''):
+        timer_proc(TIMER_START, self.timer_update, 200, tag='')
+        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+        pass
 
 
     def show_history(self):
@@ -330,10 +364,12 @@ class Command:
             self.p.send_signal(SIGTERM)
         except:
             pass
+
         if IS_WIN:
             self.p.wait()
         while self.p:
             self.timer_update()
+
         self.block.release()
         sleep(0.25)
 
