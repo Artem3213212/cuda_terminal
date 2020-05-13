@@ -20,3 +20,8 @@ section=commands
 caption=Terminal\Config
 method=config
 menu=o
+
+[bottombar1]
+hint=Terminal
+icon={dir}/terminal.png
+method=open

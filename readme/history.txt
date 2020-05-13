@@ -1,4 +1,7 @@
 
+2020.05.13
++ app shows Terminal button on sidebar without loading the plugin (CudaText 1.99.1+)
+
 2019.08.31
 + on macOS, plugin appends to PATH several paths: /usr/local/bin, /usr/local/sbin, /opt/local/bin, /opt/local/sbin
 
