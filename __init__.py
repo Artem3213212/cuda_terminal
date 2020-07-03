@@ -14,6 +14,7 @@ from cudatext import *
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
+MAX_BUFFER = 100*1000
 MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
@@ -43,7 +44,10 @@ class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
+
     def run(self):
+        global CODE_TABLE
+        global MAX_BUFFER
         if not IS_WIN:
             while True:
                 s = self.Cmd.p.stdout.read(1)
@@ -60,6 +64,7 @@ class ControlTh(Thread):
                     self.Cmd.btextchanged = True
                     self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
+                self.Cmd.btext = self.Cmd.btext[-MAX_BUFFER:]
         else:
             while True:
                 pp1 = self.Cmd.p.stdout.tell()
@@ -80,6 +85,7 @@ class ControlTh(Thread):
                     self.Cmd.btextchanged = True
                     self.Cmd.btext=self.Cmd.btext+s
                     self.Cmd.block.release()
+                self.Cmd.btext = self.Cmd.btext[-MAX_BUFFER:]
                 sleep(0.02)
 
 
@@ -89,6 +95,12 @@ class Command:
 
         global CODE_TABLE
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
+
+        global MAX_BUFFER
+        try:
+            MAX_BUFFER = int(ini_read(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER)))
+        except:
+            pass
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
@@ -223,6 +235,7 @@ class Command:
 
     def config(self):
 
+        ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
