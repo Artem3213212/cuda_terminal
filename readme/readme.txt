@@ -10,8 +10,8 @@ Hotkeys in the terminal:
 - Break: interrupt/restart shell process
 
 Authors:
-- Alexey (CudaText)
-- Artem Gavrilov (@Artem3213212)
+- Alexey Torgashin (CudaText)
+- Artem Gavrilov https://github.com/Artem3213212
 
 License: MIT
-Credits for icon: Github.com, MIT license
+Credits for icon: GitHub.com, MIT license
