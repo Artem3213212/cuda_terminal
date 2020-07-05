@@ -56,8 +56,6 @@ class ControlTh(Thread):
         self.Cmd.block.release()
 
     def run(self):
-        global CODE_TABLE
-        global MAX_BUFFER
         if not IS_WIN:
             while True:
                 s = self.Cmd.p.stdout.read(READSIZE)
