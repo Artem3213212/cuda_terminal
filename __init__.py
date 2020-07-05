@@ -23,6 +23,7 @@ DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
 READSIZE = 6*1024
+MSG_ENDED = "\nConsole process was terminated.\n"
 
 
 def log(s):
@@ -60,7 +61,7 @@ class ControlTh(Thread):
             while True:
                 s = self.Cmd.p.stdout.read(READSIZE)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
+                    s = MSG_ENDED.encode(CODE_TABLE)
                     self.add_buf(s, True)
                     break
                 if s != '':
@@ -72,7 +73,7 @@ class ControlTh(Thread):
                 pp2 = self.Cmd.p.stdout.tell()
                 self.Cmd.p.stdout.seek(pp1)
                 if self.Cmd.p.poll() != None:
-                    s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
+                    s = MSG_ENDED.encode(CODE_TABLE)
                     self.add_buf(s, True)
                     break
                 if pp2!=pp1:
