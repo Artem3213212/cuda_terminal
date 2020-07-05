@@ -22,6 +22,7 @@ DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
+READSIZE = 6*1024
 
 
 def log(s):
@@ -50,7 +51,7 @@ class ControlTh(Thread):
         global MAX_BUFFER
         if not IS_WIN:
             while True:
-                s = self.Cmd.p.stdout.read(1)
+                s = self.Cmd.p.stdout.read(READSIZE)
                 if self.Cmd.p.poll() != None:
                     s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
                     self.Cmd.block.acquire()
