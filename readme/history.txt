@@ -1,5 +1,6 @@
 
-2020.07.03
+2020.07.05
++ increase read buffer size (1 byte->6K) to not freeze on big tools output
 + add option "max_buffer_size" (default 100K) to not take too much memory
 
 2020.05.13
