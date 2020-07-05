@@ -46,6 +46,15 @@ class ControlTh(Thread):
         Thread.__init__(self)
         self.Cmd = Cmd
 
+    def add_buf(self, s, clear):
+        self.Cmd.block.acquire()
+        self.Cmd.btextchanged = True
+        #limit the buffer size!
+        self.Cmd.btext = (self.Cmd.btext+s)[-MAX_BUFFER:]
+        if clear:
+            self.Cmd.p=None
+        self.Cmd.block.release()
+
     def run(self):
         global CODE_TABLE
         global MAX_BUFFER
@@ -54,18 +63,10 @@ class ControlTh(Thread):
                 s = self.Cmd.p.stdout.read(READSIZE)
                 if self.Cmd.p.poll() != None:
                     s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
-                    self.Cmd.block.acquire()
-                    self.Cmd.btextchanged = True
-                    self.Cmd.btext=self.Cmd.btext+s
-                    self.Cmd.p=None
-                    self.Cmd.block.release()
+                    self.add_buf(s, True)
                     break
                 if s != '':
-                    self.Cmd.block.acquire()
-                    self.Cmd.btextchanged = True
-                    self.Cmd.btext=self.Cmd.btext+s
-                    self.Cmd.block.release()
-                self.Cmd.btext = self.Cmd.btext[-MAX_BUFFER:]
+                    self.add_buf(s, False)
         else:
             while True:
                 pp1 = self.Cmd.p.stdout.tell()
@@ -74,19 +75,11 @@ class ControlTh(Thread):
                 self.Cmd.p.stdout.seek(pp1)
                 if self.Cmd.p.poll() != None:
                     s = "\nConsole process was terminated.\n".encode(CODE_TABLE)
-                    self.Cmd.block.acquire()
-                    self.Cmd.btextchanged = True
-                    self.Cmd.btext=self.Cmd.btext+s
-                    self.Cmd.p=None
-                    self.Cmd.block.release()
+                    self.add_buf(s, True)
                     break
                 if pp2!=pp1:
                     s = self.Cmd.p.stdout.read(pp2-pp1)
-                    self.Cmd.block.acquire()
-                    self.Cmd.btextchanged = True
-                    self.Cmd.btext=self.Cmd.btext+s
-                    self.Cmd.block.release()
-                self.Cmd.btext = self.Cmd.btext[-MAX_BUFFER:]
+                    self.add_buf(s, False)
                 sleep(0.02)
 
 
