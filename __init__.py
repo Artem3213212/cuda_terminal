@@ -231,8 +231,6 @@ class Command:
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
         self.input.set_prop(PROP_MICROMAP, False)
 
-        dlg_proc(h, DLG_CTL_FOCUS, name='input')
-
         return h
 
 
@@ -294,8 +292,6 @@ class Command:
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
         timer_proc(TIMER_START, self.timer_update, 200, tag='')
-        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
-        pass
 
 
     def show_history(self):
