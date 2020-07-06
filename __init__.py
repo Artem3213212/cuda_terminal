@@ -173,33 +173,42 @@ class Command:
             'on_hide': self.form_hide,
             })
 
-        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        n = dlg_proc(h, DLG_CTL_ADD, 'panel')
+        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'memo',
-            'align': ALIGN_CLIENT,
-            'font_size': self.font_size,
+            'name': 'panel_b',
+            'border': False,
+            'align': ALIGN_BOTTOM,
+            'h': 26,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'input',
+            'p': 'panel_b',
             'border': True,
-            'align': ALIGN_BOTTOM,
+            'align': ALIGN_CLIENT,
             'font_size': self.font_size,
-            'h': 26,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'break',
-            'p': 'input',
+            'p': 'panel_b',
             'align': ALIGN_RIGHT,
             'w': 90,
             'cap': 'Break',
             'hint': 'Hotkey: Break',
             'on_change': self.button_break_click,
+            })
+
+        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
+        self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'memo',
+            'align': ALIGN_CLIENT,
+            'font_size': self.font_size,
             })
 
         self.memo.set_prop(PROP_RO, True)
@@ -220,6 +229,7 @@ class Command:
         self.input.set_prop(PROP_MARGIN, 2000)
         self.input.set_prop(PROP_HILITE_CUR_LINE, False)
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
+        self.input.set_prop(PROP_MICROMAP, False)
 
         dlg_proc(h, DLG_CTL_FOCUS, name='input')
 
