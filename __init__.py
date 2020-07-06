@@ -22,9 +22,11 @@ DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
+SHOW_PROMPT = 'dir' if IS_WIN else 'pwd'
 READSIZE = 6*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
-
+INPUT_H = 26
+HOMEDIR = os.path.expanduser('~')
 
 def log(s):
     # Change conditional to True to log messages in a Debug process
@@ -33,21 +35,34 @@ def log(s):
         print(now.strftime("%H:%M:%S ") + s)
     pass
 
-
 def bool_to_str(v):
     return '1' if v else '0'
 
-
 def str_to_bool(s):
     return s=='1'
+
+def pretty_path(s):
+    if not IS_WIN:
+        if s==HOMEDIR:
+            s = '~'
+        elif s.startswith(HOMEDIR+'/'):
+            s = '~'+s[len(HOMEDIR):]
+    return s
 
 
 class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
+        self.getdir = False
 
     def add_buf(self, s, clear):
+        if self.getdir:
+            s = s.decode(CODE_TABLE).rstrip('\n')
+            s = pretty_path(s)
+            dlg_proc(self.Cmd.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
+            return
+
         self.Cmd.block.acquire()
         self.Cmd.btextchanged = True
         #limit the buffer size!
@@ -161,6 +176,8 @@ class Command:
 
         dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
 
+        self.update_prompt()
+
 
     def init_form(self):
 
@@ -179,17 +196,7 @@ class Command:
             'name': 'panel_b',
             'border': False,
             'align': ALIGN_BOTTOM,
-            'h': 26,
-            })
-
-        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
-        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'input',
-            'p': 'panel_b',
-            'border': True,
-            'align': ALIGN_CLIENT,
-            'font_size': self.font_size,
+            'h': INPUT_H,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
@@ -201,6 +208,31 @@ class Command:
             'cap': 'Break',
             'hint': 'Hotkey: Break',
             'on_change': self.button_break_click,
+            })
+
+        n = dlg_proc(h, DLG_CTL_ADD, 'label')
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'prompt',
+            'p': 'panel_b',
+            'a_t': ('break', '-'),
+            'a_l': ('panel_b', '['),
+            'sp_l': 4,
+            'sp_r': 4,
+            'w_max': 400,
+            'font_size': self.font_size,
+            })
+
+        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
+        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
+        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
+            'name': 'input',
+            'p': 'panel_b',
+            'border': True,
+            'h': INPUT_H,
+            'a_l': ('prompt', ']'),
+            'a_r': ('break', '['),
+            'a_t': ('break', '-'),
+            'font_size': self.font_size,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
@@ -359,12 +391,22 @@ class Command:
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
 
 
+    def update_prompt(self):
+        if self.p:
+            self.CtlTh.getdir=True
+            self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
+            self.p.stdin.flush()
+            sleep(0.2)
+            self.CtlTh.getdir=False
+
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
 
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
+
+        self.update_prompt()
 
 
     def on_exit(self, ed_self):
