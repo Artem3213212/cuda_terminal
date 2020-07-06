@@ -181,6 +181,10 @@ class Command:
 
     def init_form(self):
 
+        colors = app_proc(PROC_THEME_UI_DICT_GET,'')
+        color_btn_back = colors['ButtonBgPassive']['color']
+        color_btn_font = colors['ButtonFont']['color']
+
         h = dlg_proc(0, DLG_CREATE)
         dlg_proc(h, DLG_PROP_SET, prop={
             'border': False,
@@ -197,6 +201,8 @@ class Command:
             'border': False,
             'align': ALIGN_BOTTOM,
             'h': INPUT_H,
+            'color': color_btn_back,
+            'font_color': color_btn_font,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
