@@ -192,25 +192,18 @@ class Command:
             'on_key_down': self.form_key_down,
             'on_show': self.form_show,
             'on_hide': self.form_hide,
-            })
-
-        n = dlg_proc(h, DLG_CTL_ADD, 'panel')
-        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
-        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'panel_b',
-            'border': False,
-            'align': ALIGN_BOTTOM,
-            'h': INPUT_H,
             'color': color_btn_back,
-            'font_color': color_btn_font,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'button_ex')
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'break',
-            'p': 'panel_b',
-            'align': ALIGN_RIGHT,
+            'a_l': None,
+            'a_t': None,
+            'a_r': ('', ']'),
+            'a_b': ('', ']'),
             'w': 90,
+            'h': INPUT_H,
             'cap': 'Break',
             'hint': 'Hotkey: Break',
             'on_change': self.button_break_click,
@@ -219,20 +212,18 @@ class Command:
         n = dlg_proc(h, DLG_CTL_ADD, 'label')
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'prompt',
-            'p': 'panel_b',
+            'a_l': ('', '['),
             'a_t': ('break', '-'),
-            'a_l': ('panel_b', '['),
             'sp_l': 4,
             'sp_r': 4,
             'w_max': 400,
             'font_size': self.font_size,
+            'font_color': color_btn_font,
             })
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'input',
-            'p': 'panel_b',
             'border': True,
             'h': INPUT_H,
             'a_l': ('prompt', ']'),
@@ -240,14 +231,18 @@ class Command:
             'a_t': ('break', '-'),
             'font_size': self.font_size,
             })
+        self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
 
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
-        self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'memo',
-            'align': ALIGN_CLIENT,
+            'a_t': ('', '['),
+            'a_l': ('', '['),
+            'a_r': ('', ']'),
+            'a_b': ('break', '['),
             'font_size': self.font_size,
             })
+        self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
 
         self.memo.set_prop(PROP_RO, True)
         self.memo.set_prop(PROP_CARET_VIRTUAL, False)
