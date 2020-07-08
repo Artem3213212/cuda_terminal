@@ -58,8 +58,9 @@ class ControlTh(Thread):
 
     def add_buf(self, s, clear):
         if self.getdir:
-            s = s.decode(CODE_TABLE).rstrip('\n')
-            s = pretty_path(s)
+            self.getdir=False
+            s=s.decode(CODE_TABLE).rstrip('\n')
+            s=pretty_path(s)
             dlg_proc(self.Cmd.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
             return
 
@@ -402,8 +403,6 @@ class Command:
             self.CtlTh.getdir=True
             self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
-            sleep(0.2)
-            self.CtlTh.getdir=False
 
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
