@@ -54,14 +54,12 @@ class ControlTh(Thread):
     def __init__(self, Cmd):
         Thread.__init__(self)
         self.Cmd = Cmd
-        self.getdir = False
 
     def add_buf(self, s, clear):
-        if self.getdir:
-            self.getdir=False
-            s=s.decode(CODE_TABLE).rstrip('\n')
-            s=pretty_path(s)
-            dlg_proc(self.Cmd.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
+        if self.Cmd.getdir:
+            self.Cmd.getdir = False
+            s = s.decode(CODE_TABLE).rstrip('\n')
+            self.Cmd.curdir = pretty_path(s)
             return
 
         self.Cmd.block.acquire()
@@ -99,6 +97,8 @@ class ControlTh(Thread):
 
 
 class Command:
+    getdir = False
+    curdir = ''
 
     def __init__(self):
 
@@ -400,9 +400,11 @@ class Command:
 
     def update_prompt(self):
         if self.p:
-            self.CtlTh.getdir=True
+            self.getdir = True
             self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
+            sleep(0.1)
+            dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': self.curdir,})
 
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
