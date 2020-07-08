@@ -18,7 +18,7 @@ MAX_BUFFER = 100*1000
 MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
-DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
+DEF_SHELL = 'cmd.exe' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
@@ -100,7 +100,7 @@ class Command:
     curdir = '??'
 
     def __init__(self):
-
+        
         global CODE_TABLE
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
 
@@ -113,6 +113,9 @@ class Command:
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
+
+    def open(self):
+
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
 
@@ -142,39 +145,35 @@ class Command:
 
         self.title = 'Terminal'
         self.h_dlg = self.init_form()
+
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
+        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+
         self.p = None
         self.block = Lock()
         self.block.acquire()
         self.btext = b''
         timer_proc(TIMER_START, self.timer_update, 200, tag='')
 
+        env = os.environ
+        if IS_MAC:
+            env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
 
-    def open(self):
+        self.p = Popen(
+            os.path.expandvars(self.shell_path),
+            stdin = PIPE,
+            stdout = PIPE,
+            stderr = STDOUT,
+            shell = IS_WIN,
+            bufsize = 0,
+            env = env
+            )
 
-        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-
-        if not self.p:
-            env = os.environ
-            if IS_MAC:
-                env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
-
-            self.p = Popen(
-                os.path.expandvars(self.shell_path),
-                stdin = PIPE,
-                stdout = PIPE,
-                stderr = STDOUT,
-                shell = IS_WIN,
-                bufsize = 0,
-                env = env
-                )
-
-            #w,self.r=os.pipe()
-            self.p.stdin.flush()
-            self.CtlTh=ControlTh(self)
-            self.CtlTh.start()
-
-        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+        #w,self.r=os.pipe()
+        self.p.stdin.flush()
+        self.CtlTh=ControlTh(self)
+        self.CtlTh.start()
 
         self.update_prompt()
 
