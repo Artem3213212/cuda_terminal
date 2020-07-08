@@ -1,23 +1,27 @@
 
+2020.07.09
++ add: reworked dialog, now it shows current-folder to the left of input (tested with Cmd.exe, Bash)
+- fix: initially, input was not focused
+
 2020.07.05
-+ increase read buffer size (1 byte->6K) to not freeze on big tools output
-+ add option "max_buffer_size" (default 100K) to not take too much memory
++ add: increase read buffer size (1 byte->6K) to not freeze on big tools output
++ add: option "max_buffer_size" (default 100K) to not take too much memory
 
 2020.05.13
-+ app shows Terminal button on sidebar without loading the plugin (CudaText 1.99.1+)
++ add: app shows Terminal button on sidebar without loading the plugin (CudaText 1.99.1+)
 
 2019.08.31
-+ on macOS, plugin appends to PATH several paths: /usr/local/bin, /usr/local/sbin, /opt/local/bin, /opt/local/sbin
++ add: on macOS, plugin appends to PATH several paths: /usr/local/bin, /usr/local/sbin, /opt/local/bin, /opt/local/sbin
 
 2019.08.30
-* used current app theme colors, deleted 2 color options
-- must hide minimap in terminal memo
+* change: used current app theme colors, deleted 2 color options
+- fix: must hide minimap in terminal memo
 
 2018.10.24
-- avoid deleted CudaText API
+- fix: avoid deleted CudaText API
 
 2018.04.03
-+ support "sudo" commands (replacing "sudo" to "sudo --stdin")
++ add: support "sudo" commands (replacing "sudo" to "sudo --stdin")
 
 2018.04.01
 - fixes for stability (some hangs on Break click)
