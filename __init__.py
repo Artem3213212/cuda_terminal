@@ -43,10 +43,12 @@ def str_to_bool(s):
 
 def pretty_path(s):
     if not IS_WIN:
+        s = s.rstrip('\n')
         if s==HOMEDIR:
             s = '~'
         elif s.startswith(HOMEDIR+'/'):
             s = '~'+s[len(HOMEDIR):]
+        s += '$'
     return s
 
 
