@@ -388,30 +388,22 @@ class Command:
         self.run_cmd(self.history[n])
 
 
-    def add_output(self, s):
-        self.memo.set_prop(PROP_RO, False)
-        text = self.memo.get_text_all()
-        self.memo.set_text_all(text+s)
-        self.memo.set_prop(PROP_RO, True)
-
-        self.memo.cmd(cmds.cCommand_GotoTextEnd)
-
-
     def update_prompt(self):
-        if self.p:
-            self.getdir = True
-            self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
-            self.p.stdin.flush()
-            sleep(0.1)
-            self.getdir = False
+        if not self.p: return
+        self.getdir = True
+        self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
+        self.p.stdin.flush()
+        sleep(0.1)
+        self.getdir = False
             
-            lines = self.curdir.splitlines()
-            if IS_WIN:
-                #calculate folder from reply, find line ending with >
-                lines = [s for s in lines if s.endswith('>')]
-            if not lines: return
-            s = lines[0]
-            dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
+        lines = self.curdir.splitlines()
+        if IS_WIN:
+            #calculate folder from reply, Cmd.exe makes crap lines
+            lines = [s for s in lines if s.endswith('>')]
+        if not lines: return
+        s = lines[0]
+
+        dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
 
 
     def update_output(self, s):
