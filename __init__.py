@@ -413,13 +413,14 @@ class Command:
             s = lines[0]
             dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
 
+
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
 
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
-
+        self.memo.set_prop(PROP_LINE_TOP, self.memo.get_line_count()-3)
         self.update_prompt()
 
 
