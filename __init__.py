@@ -22,7 +22,7 @@ DEF_SHELL = r'%windir%\system32\cmd' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_PROMPT = 'echo [`pwd`]$ '
-SHOW_PROMPT = 'dir' if IS_WIN else 'pwd'
+SHOW_PROMPT = 'cd' if IS_WIN else 'pwd'
 READSIZE = 6*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
 INPUT_H = 26
@@ -57,8 +57,7 @@ class ControlTh(Thread):
 
     def add_buf(self, s, clear):
         if self.Cmd.getdir:
-            self.Cmd.getdir = False
-            s = s.decode(CODE_TABLE).rstrip('\n')
+            s = s.decode(CODE_TABLE)
             self.Cmd.curdir = pretty_path(s)
             return
 
@@ -98,7 +97,7 @@ class ControlTh(Thread):
 
 class Command:
     getdir = False
-    curdir = ''
+    curdir = '??'
 
     def __init__(self):
 
@@ -404,7 +403,15 @@ class Command:
             self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
             sleep(0.1)
-            dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': self.curdir,})
+            self.getdir = False
+            
+            lines = self.curdir.splitlines()
+            if IS_WIN:
+                #calculate folder from reply, find line ending with >
+                lines = [s for s in lines if s.endswith('>')]
+            if not lines: return
+            s = lines[0]
+            dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
 
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
