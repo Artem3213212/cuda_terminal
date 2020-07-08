@@ -1,6 +1,7 @@
 
 2020.07.09
 + add: reworked dialog, now it shows current-folder to the left of input (tested with Cmd.exe, Bash)
++ add: show # char if under Unix root
 - fix: initially, input was not focused
 
 2020.07.05
