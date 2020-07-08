@@ -22,8 +22,8 @@ IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 DEF_SHELL = 'cmd.exe' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
-BASH_CHAR = '#' if IS_UNIX_ROOT else '$'
-BASH_PROMPT = 'echo [`pwd`]'+BASH_CHAR+' '
+PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$' if not IS_WIN else '>'
+BASH_PROMPT = 'echo [`pwd`]'+PROMPT_CHAR+' '
 SHOW_PROMPT = 'cd' if IS_WIN else 'pwd'
 READSIZE = 4*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
@@ -50,7 +50,6 @@ def pretty_path(s):
             s = '~'
         elif s.startswith(HOMEDIR+'/'):
             s = '~'+s[len(HOMEDIR):]
-        s += BASH_CHAR
     return s
 
 
@@ -403,7 +402,7 @@ class Command:
         if IS_WIN:
             lines = [s for s in lines if ':\\' in s]
         if not lines: return
-        s = lines[0]
+        s = lines[0] + PROMPT_CHAR
 
         dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
 
