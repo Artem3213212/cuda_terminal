@@ -401,7 +401,7 @@ class Command:
             
         lines = self.curdir.splitlines()
         if IS_WIN:
-            lines = [s for s in lines if ':' in s]
+            lines = [s for s in lines if ':\\' in s]
         if not lines: return
         s = lines[0]
 
