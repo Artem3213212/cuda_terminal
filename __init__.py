@@ -18,14 +18,14 @@ MAX_BUFFER = 100*1000
 MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
-IS_UNIX_ROOT = os.geteuid() == 0
+IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 DEF_SHELL = 'cmd.exe' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 BASH_CHAR = '#' if IS_UNIX_ROOT else '$'
 BASH_PROMPT = 'echo [`pwd`]'+BASH_CHAR+' '
 SHOW_PROMPT = 'cd' if IS_WIN else 'pwd'
-READSIZE = 6*1024
+READSIZE = 4*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
 INPUT_H = 26
 HOMEDIR = os.path.expanduser('~')
