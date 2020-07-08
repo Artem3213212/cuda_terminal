@@ -24,7 +24,7 @@ DEF_ADD_PROMPT = not IS_WIN
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$' if not IS_WIN else '>'
 BASH_PROMPT = 'echo [`pwd`]'+PROMPT_CHAR+' '
-SHOW_PROMPT = 'cd' if IS_WIN else 'pwd'
+PRINT_DIR = 'cd' if IS_WIN else 'pwd'
 READSIZE = 4*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
 INPUT_H = 26
@@ -393,7 +393,7 @@ class Command:
     def update_prompt(self):
         if not self.p: return
         self.getdir = True
-        self.p.stdin.write((SHOW_PROMPT+'\n').encode(CODE_TABLE))
+        self.p.stdin.write((PRINT_DIR+'\n').encode(CODE_TABLE))
         self.p.stdin.flush()
         sleep(0.1)
         self.getdir = False
