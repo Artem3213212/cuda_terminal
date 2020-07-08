@@ -115,6 +115,7 @@ class Command:
             pass
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
+        self.shell_init_windows = ini_read(fn_config, 'op', 'shell_init_windows', 'echo off')
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
@@ -158,7 +159,6 @@ class Command:
         self.block = Lock()
         self.block.acquire()
         self.btext = b''
-        timer_proc(TIMER_START, self.timer_update, 200, tag='')
 
         env = os.environ
         if IS_MAC:
@@ -174,12 +174,16 @@ class Command:
             env = env
             )
 
-        #w,self.r=os.pipe()
+        if IS_WIN:
+            self.p.stdin.write((self.shell_init_windows+'\n').encode(CODE_TABLE))
+            self.p.stdin.flush()            
+
         self.p.stdin.flush()
-        self.CtlTh=ControlTh(self)
+        self.CtlTh = ControlTh(self)
         self.CtlTh.start()
 
         self.update_prompt()
+        timer_proc(TIMER_START, self.timer_update, 200, tag='')
 
 
     def init_form(self):
@@ -275,6 +279,7 @@ class Command:
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
+        ini_write(fn_config, 'op', 'shell_init_windows', self.shell_init_windows)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
 
@@ -396,8 +401,7 @@ class Command:
             
         lines = self.curdir.splitlines()
         if IS_WIN:
-            #calculate folder from reply, Cmd.exe makes crap lines
-            lines = [s for s in lines if s.endswith('>')]
+            lines = [s for s in lines if ':' in s]
         if not lines: return
         s = lines[0]
 
