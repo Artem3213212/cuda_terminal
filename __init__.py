@@ -301,15 +301,15 @@ class Command:
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
 
         #Enter
-        if id_ctl==keys.VK_ENTER:
+        if (id_ctl==keys.VK_ENTER) and (data==''):
             text = self.input.get_text_line(0)
             self.input.set_text_all('')
             self.input.set_caret(0, 0)
             self.run_cmd(text)
             return False
 
-        #history menu
-        if (id_ctl==keys.VK_DOWN):
+        #Ctrl+Down: history menu
+        if (id_ctl==keys.VK_DOWN) and (data=='c'):
             self.show_history()
             return False
 
