@@ -7,6 +7,7 @@
 + add: option 'shell_macos'
 + add: option 'shell_unix'
 + add: option 'shell_windows'
+- fix: was not focused on next plugin calls
 - fix: initially, input was not focused
 
 2020.07.05
