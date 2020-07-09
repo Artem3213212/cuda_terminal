@@ -190,8 +190,8 @@ class Command:
         #dont init form twice!
         if not self.h_dlg:
             self.open_init()
-                    
-        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+
+        app_proc(PROC_BOTTOMPANEL_ACTIVATE, (self.title, True)) #True - set focus
         dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
 
 
