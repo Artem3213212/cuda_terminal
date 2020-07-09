@@ -21,12 +21,11 @@ IS_MAC = sys.platform=='darwin'
 IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 DEF_SHELL = 'cmd.exe' if IS_WIN else 'bash'
 DEF_ADD_PROMPT = not IS_WIN
-DEF_PRINT_DIR = 'cd' if IS_WIN else 'pwd'
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$' if not IS_WIN else '>'
 BASH_PROMPT = 'echo [`pwd`]'+PROMPT_CHAR+' '
-READSIZE = 4*1024
 MSG_ENDED = "\nConsole process was terminated.\n"
+READSIZE = 4*1024
 INPUT_H = 26
 HOMEDIR = os.path.expanduser('~')
 
@@ -115,7 +114,6 @@ class Command:
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
-        self.print_dir = ini_read(fn_config, 'op', 'print_dir', DEF_PRINT_DIR)
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
     def exec(self, s):
@@ -267,7 +265,6 @@ class Command:
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
-        ini_write(fn_config, 'op', 'print_dir', self.print_dir)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
 
