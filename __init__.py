@@ -329,11 +329,9 @@ class Command:
 
     def form_hide(self, id_dlg, id_ctl, data='', info=''):
         timer_proc(TIMER_STOP, self.timer_update, 0)
-        pass
-
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
-        timer_proc(TIMER_START, self.timer_update, 200, tag='')
+        timer_proc(TIMER_START, self.timer_update, 400, tag='')
 
 
     def show_history(self):
