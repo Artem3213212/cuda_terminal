@@ -1,5 +1,6 @@
 
-2020.07.09.4
+2020.07.09.5
+* change: on choosing item in drop-down menu, place item to input field
 + add: option 'dark_colors'
 + add: option 'shell_unix'
 + add: option 'shell_windows'

@@ -386,7 +386,10 @@ class Command:
 
     def run_cmd_n(self, n):
 
-        self.run_cmd(self.history[n])
+        if n<len(self.history):
+            s = self.history[n]
+            self.input.set_text_all(s)
+            self.input.set_caret(len(s), 0)
 
 
     def update_output(self, s):
