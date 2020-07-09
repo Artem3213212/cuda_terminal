@@ -28,9 +28,7 @@ BASH_PROMPT = 'echo [$PWD]'+PROMPT_CHAR+' '
 MSG_ENDED = "\nConsole process was terminated.\n"
 READSIZE = 4*1024
 HOMEDIR = os.path.expanduser('~')
-
-scale_ui, scale_font = app_proc(PROC_CONFIG_SCALE_GET, '') if API>=343 else (100, 100)
-INPUT_H = 26 * scale_ui // 100
+INPUT_H = 26
 
 def log(s):
     # Change conditional to True to log messages in a Debug process
@@ -284,6 +282,7 @@ class Command:
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
         self.input.set_prop(PROP_MICROMAP, False)
 
+        dlg_proc(h, DLG_SCALE)
         return h
 
 
