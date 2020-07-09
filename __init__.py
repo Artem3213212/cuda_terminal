@@ -274,8 +274,12 @@ class Command:
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, color_memo_back))
         self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, color_memo_font))
 
-        self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
+        self.input.set_prop(PROP_GUTTER_ALL, True)
+        self.input.set_prop(PROP_GUTTER_NUM, False)
+        self.input.set_prop(PROP_GUTTER_FOLD, False)
+        self.input.set_prop(PROP_GUTTER_BM, False)
+        self.input.set_prop(PROP_GUTTER_STATES, False)
         self.input.set_prop(PROP_UNPRINTED_SHOW, False)
         self.input.set_prop(PROP_MARGIN, 2000)
         self.input.set_prop(PROP_HILITE_CUR_LINE, False)
