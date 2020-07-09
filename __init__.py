@@ -101,6 +101,8 @@ class ControlTh(Thread):
 class Command:
     getdir = False
     curdir = '??'
+    title = 'Terminal'
+    h_dlg = None
 
     def __init__(self):
 
@@ -120,14 +122,6 @@ class Command:
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
         self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
-
-    def exec(self, s):
-
-        if self.p and s:
-            self.p.stdin.write((s+'\n').encode(ENC))
-            self.p.stdin.flush()
-
-    def open(self):
 
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
@@ -156,12 +150,12 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
         self.menu_calls += [ lambda: self.run_cmd_n(21) ]
 
-        self.title = 'Terminal'
+
+    def open_init(self):
+
         self.h_dlg = self.init_form()
 
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
-        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
-        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
 
         self.p = None
         self.block = Lock()
@@ -189,6 +183,23 @@ class Command:
 
         timer_proc(TIMER_START, self.timer_update, 200, tag='')
         self.show_bash_prompt()
+
+
+    def open(self):
+
+        #dont init form twice!
+        if not self.h_dlg:
+            self.open_init()
+                    
+        app_proc(PROC_BOTTOMPANEL_ACTIVATE, self.title)
+        dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+
+
+    def exec(self, s):
+
+        if self.p and s:
+            self.p.stdin.write((s+'\n').encode(ENC))
+            self.p.stdin.flush()
 
 
     def init_form(self):
