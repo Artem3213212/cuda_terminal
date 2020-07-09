@@ -20,6 +20,7 @@ IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
 IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 SHELL_UNIX = 'bash'
+SHELL_MAC = 'bash'
 SHELL_WIN = 'cmd.exe'
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$'
@@ -113,6 +114,7 @@ class Command:
             pass
 
         self.shell_unix = ini_read(fn_config, 'op', 'shell_unix', SHELL_UNIX)
+        self.shell_mac = ini_read(fn_config, 'op', 'shell_macos', SHELL_MAC)
         self.shell_win = ini_read(fn_config, 'op', 'shell_windows', SHELL_WIN)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
@@ -169,7 +171,7 @@ class Command:
         if IS_MAC:
             env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
 
-        shell = self.shell_win if IS_WIN else self.shell_unix
+        shell = self.shell_win if IS_WIN else self.shell_mac if IS_MAC else self.shell_unix
         self.p = Popen(
             os.path.expandvars(shell),
             stdin = PIPE,
@@ -273,6 +275,7 @@ class Command:
 
         ini_write(fn_config, 'op', 'shell_windows', self.shell_win)
         ini_write(fn_config, 'op', 'shell_unix', self.shell_unix)
+        ini_write(fn_config, 'op', 'shell_macos', self.shell_mac)
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
