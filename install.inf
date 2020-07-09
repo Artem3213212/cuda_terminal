@@ -4,7 +4,7 @@ desc=Gives "Terminal" panel in the bottom panel of CudaText
 type=cudatext-plugin
 subdir=cuda_terminal
 homepage=https://github.com/Artem3213212/cuda_terminal
-api=1.0.234
+api=1.0.331
 
 [item1]
 section=events
