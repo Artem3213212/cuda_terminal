@@ -103,7 +103,7 @@ class Command:
     curdir = '??'
 
     def __init__(self):
-        
+
         global CODE_TABLE
         CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
 
@@ -119,10 +119,10 @@ class Command:
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
     def exec(self, s):
-        
+
         if self.p:
             self.p.stdin.write((s+'\n').encode(CODE_TABLE))
-            self.p.stdin.flush()            
+            self.p.stdin.flush()
 
     def open(self):
 
@@ -398,7 +398,7 @@ class Command:
         self.exec(PRINT_DIR)
         sleep(0.1)
         self.getdir = False
-            
+
         lines = self.curdir.splitlines()
         if IS_WIN:
             lines = [s for s in lines if ':\\' in s]
