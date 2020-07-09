@@ -116,6 +116,7 @@ class Command:
         self.shell_win = ini_read(fn_config, 'op', 'shell_windows', SHELL_WIN)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
+        self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
 
     def exec(self, s):
 
@@ -192,6 +193,9 @@ class Command:
         color_btn_back = colors['ButtonBgPassive']['color']
         color_btn_font = colors['ButtonFont']['color']
 
+        color_memo_back = 0x0 if self.dark_colors else color_btn_back
+        color_memo_font = 0xC0C0C0 if self.dark_colors else color_btn_font
+
         h = dlg_proc(0, DLG_CREATE)
         dlg_proc(h, DLG_PROP_SET, prop={
             'border': False,
@@ -250,6 +254,8 @@ class Command:
         self.memo.set_prop(PROP_MODERN_SCROLLBAR, True)
         self.memo.set_prop(PROP_MINIMAP, False)
         self.memo.set_prop(PROP_MICROMAP, False)
+        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextBg, color_memo_back))
+        self.memo.set_prop(PROP_COLOR, (COLOR_ID_TextFont, color_memo_font))
 
         self.input.set_prop(PROP_GUTTER_ALL, False)
         self.input.set_prop(PROP_ONE_LINE, True)
@@ -267,6 +273,7 @@ class Command:
         ini_write(fn_config, 'op', 'shell_windows', self.shell_win)
         ini_write(fn_config, 'op', 'shell_unix', self.shell_unix)
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
+        ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
