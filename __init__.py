@@ -331,7 +331,7 @@ class Command:
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
-        timer_proc(TIMER_START, self.timer_update, 400, tag='')
+        timer_proc(TIMER_START, self.timer_update, 300, tag='')
 
 
     def show_history(self):
