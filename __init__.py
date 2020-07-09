@@ -27,8 +27,14 @@ PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$'
 BASH_PROMPT = 'echo [$PWD]'+PROMPT_CHAR+' '
 MSG_ENDED = "\nConsole process was terminated.\n"
 READSIZE = 4*1024
-INPUT_H = 26
 HOMEDIR = os.path.expanduser('~')
+
+if API>=343:
+    scale_ui, scale_font = app_proc(PROC_CONFIG_SCALE_GET, '')
+else:
+    scale_ui, scale_font = 100, 100
+
+INPUT_H = 26 * scale_ui // 100
 
 def log(s):
     # Change conditional to True to log messages in a Debug process
@@ -210,6 +216,8 @@ class Command:
 
         color_memo_back = 0x0 if self.dark_colors else color_btn_back
         color_memo_font = 0xC0C0C0 if self.dark_colors else color_btn_font
+        
+        cur_font_size = self.font_size
 
         h = dlg_proc(0, DLG_CREATE)
         dlg_proc(h, DLG_PROP_SET, prop={
@@ -243,7 +251,7 @@ class Command:
             'a_l': ('', '['),
             'a_r': ('break', '['),
             'a_t': ('break', '-'),
-            'font_size': self.font_size,
+            'font_size': cur_font_size,
             })
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
 
@@ -254,7 +262,7 @@ class Command:
             'a_l': ('', '['),
             'a_r': ('', ']'),
             'a_b': ('break', '['),
-            'font_size': self.font_size,
+            'font_size': cur_font_size,
             })
         self.memo = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
 
@@ -456,4 +464,3 @@ class Command:
         while self.p:
             self.timer_update()
         self.open()
-
