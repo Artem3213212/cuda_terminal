@@ -354,16 +354,17 @@ class Command:
         self.history += [text]
         self.input.set_text_all('')
 
-        #support password input in sudo
-        if not IS_WIN and text.startswith('sudo '):
-            text = 'sudo --stdin '+text[5:]
+        if not IS_WIN:
+            #support password input in sudo
+            if text.startswith('sudo '):
+                text = 'sudo --stdin '+text[5:]
 
-        #don't write prompt, if sudo asks for password
-        line = self.memo.get_text_line(self.memo.get_line_count()-1)
-        is_sudo = not IS_WIN and line.startswith('[sudo] ')
+            #don't write prompt, if sudo asks for password
+            line = self.memo.get_text_line(self.memo.get_line_count()-1)
+            is_sudo = line.startswith('[sudo] ')
 
-        if self.add_prompt and not IS_WIN and not is_sudo:
-            self.exec(BASH_PROMPT+text)
+            if self.add_prompt and not is_sudo:
+                self.exec(BASH_PROMPT+text)
 
         self.exec(text)
 
