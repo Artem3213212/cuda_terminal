@@ -170,7 +170,7 @@ class Command:
             env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
 
         shell = self.shell_win if IS_WIN else self.shell_unix
-        self.p = Popen(        
+        self.p = Popen(
             os.path.expandvars(shell),
             stdin = PIPE,
             stdout = PIPE,
@@ -393,6 +393,11 @@ class Command:
 
 
     def update_output(self, s):
+
+        #bash gives tailing EOL
+        if not IS_WIN:
+            s = s.rstrip('\n')
+
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
         self.memo.set_prop(PROP_RO, True)
