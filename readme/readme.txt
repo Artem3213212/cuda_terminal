@@ -5,7 +5,8 @@ Limitation: don't use interactive commands, which need keyboard input.
 Plugin has several options in the .ini file - call menu item Options/ Settings-plugins/ Terminal/ Config.
 
 Hotkeys in the terminal:
-- Down arrow: show last commands (history) menu
+- Ctrl+Down: show last commands menu, insert chosen item to input field
+- Up, Down arrows: scroll the memo area
 - Esc: close terminal and focus editor
 - Break: interrupt/restart shell process
 
