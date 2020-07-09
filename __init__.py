@@ -323,6 +323,15 @@ class Command:
             self.run_cmd(text)
             return False
 
+        #Up/Down: scroll memo
+        if (id_ctl==keys.VK_UP) and (data==''):
+            self.scroll_memo(False)
+            return False
+            
+        if (id_ctl==keys.VK_DOWN) and (data==''):
+            self.scroll_memo(True)
+            return False
+
         #Ctrl+Down: history menu
         if (id_ctl==keys.VK_DOWN) and (data=='c'):
             self.show_history()
@@ -460,3 +469,14 @@ class Command:
         while self.p:
             self.timer_update()
         self.open()
+
+    
+    def scroll_memo(self, down):
+        inf = self.memo.get_prop(PROP_SCROLL_VERT_INFO)
+        n = inf['pos']
+        nmax = inf['pos_last']
+        if down:
+            n = min(n+1, nmax)
+        else:
+            n = max(n-1, 0)
+        self.memo.set_prop(PROP_SCROLL_VERT, n)
