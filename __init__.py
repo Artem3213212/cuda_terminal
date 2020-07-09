@@ -22,7 +22,7 @@ IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 SHELL_UNIX = 'bash'
 SHELL_MAC = 'bash'
 SHELL_WIN = 'cmd.exe'
-CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
+ENC = 'cp866' if IS_WIN else 'utf8'
 PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$'
 BASH_PROMPT = 'echo [$PWD]'+PROMPT_CHAR+' '
 MSG_ENDED = "\nConsole process was terminated.\n"
@@ -60,7 +60,7 @@ class ControlTh(Thread):
 
     def add_buf(self, s, clear):
         if self.Cmd.getdir:
-            s = s.decode(CODE_TABLE)
+            s = s.decode(ENC)
             self.Cmd.curdir = pretty_path(s)
             return
 
@@ -77,7 +77,7 @@ class ControlTh(Thread):
             while True:
                 s = self.Cmd.p.stdout.read(READSIZE)
                 if self.Cmd.p.poll() != None:
-                    s = MSG_ENDED.encode(CODE_TABLE)
+                    s = MSG_ENDED.encode(ENC)
                     self.add_buf(s, True)
                     break
                 if s != '':
@@ -89,7 +89,7 @@ class ControlTh(Thread):
                 pp2 = self.Cmd.p.stdout.tell()
                 self.Cmd.p.stdout.seek(pp1)
                 if self.Cmd.p.poll() != None:
-                    s = MSG_ENDED.encode(CODE_TABLE)
+                    s = MSG_ENDED.encode(ENC)
                     self.add_buf(s, True)
                     break
                 if pp2!=pp1:
@@ -104,8 +104,9 @@ class Command:
 
     def __init__(self):
 
-        global CODE_TABLE
-        CODE_TABLE = ini_read(fn_config, 'op', 'encoding', CODE_TABLE)
+        if IS_WIN:
+            global ENC
+            ENC = ini_read(fn_config, 'op', 'encoding_windows', ENC)
 
         global MAX_BUFFER
         try:
@@ -123,7 +124,7 @@ class Command:
     def exec(self, s):
 
         if self.p and s:
-            self.p.stdin.write((s+'\n').encode(CODE_TABLE))
+            self.p.stdin.write((s+'\n').encode(ENC))
             self.p.stdin.flush()
 
     def open(self):
@@ -278,7 +279,8 @@ class Command:
         ini_write(fn_config, 'op', 'shell_macos', self.shell_mac)
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
-        ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
+        if IS_WIN:
+            ini_write(fn_config, 'op', 'encoding_windows', ENC)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
 
@@ -293,7 +295,7 @@ class Command:
         sleep(0.03)
         self.block.acquire()
         if self.btextchanged:
-            self.update_output(self.btext.decode(CODE_TABLE))
+            self.update_output(self.btext.decode(ENC))
 
 
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
