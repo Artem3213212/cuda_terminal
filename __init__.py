@@ -22,8 +22,8 @@ IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
 SHELL_UNIX = 'bash'
 SHELL_WIN = 'cmd.exe'
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
-PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$' if not IS_WIN else '>'
-BASH_PROMPT = 'echo $USER@$HOSTNAME:`pwd`'+PROMPT_CHAR+' '
+PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$'
+BASH_PROMPT = 'echo $USER@$HOSTNAME:$PWD'+PROMPT_CHAR+' '
 MSG_ENDED = "\nConsole process was terminated.\n"
 READSIZE = 4*1024
 INPUT_H = 26
