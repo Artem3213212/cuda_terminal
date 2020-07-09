@@ -1,9 +1,7 @@
 
-2020.07.09
-+ add: reworked dialog, now it shows current-folder to the left of input (tested with Cmd.exe, Bash)
+2020.07.09.2
 + add: option 'print_dir'
 + add: option 'shell_init_windows'
-+ add: show # char if under Unix root
 - fix: initially, input was not focused
 
 2020.07.05

@@ -114,14 +114,13 @@ class Command:
             pass
 
         self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
-        self.shell_init_windows = ini_read(fn_config, 'op', 'shell_init_windows', 'echo off')
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.print_dir = ini_read(fn_config, 'op', 'print_dir', DEF_PRINT_DIR)
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
     def exec(self, s):
 
-        if self.p:
+        if self.p and s:
             self.p.stdin.write((s+'\n').encode(CODE_TABLE))
             self.p.stdin.flush()
 
@@ -180,14 +179,10 @@ class Command:
             env = env
             )
 
-        if IS_WIN:
-            self.exec(self.shell_init_windows)
-
         self.p.stdin.flush()
         self.CtlTh = ControlTh(self)
         self.CtlTh.start()
 
-        self.update_prompt()
         timer_proc(TIMER_START, self.timer_update, 200, tag='')
 
 
@@ -221,24 +216,12 @@ class Command:
             'on_change': self.button_break_click,
             })
 
-        n = dlg_proc(h, DLG_CTL_ADD, 'label')
-        dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
-            'name': 'prompt',
-            'a_l': ('', '['),
-            'a_t': ('break', '-'),
-            'sp_l': 4,
-            'sp_r': 4,
-            'w_max': 400,
-            'font_size': self.font_size,
-            'font_color': color_btn_font,
-            })
-
         n = dlg_proc(h, DLG_CTL_ADD, 'editor')
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'input',
             'border': True,
             'h': INPUT_H,
-            'a_l': ('prompt', ']'),
+            'a_l': ('', '['),
             'a_r': ('break', '['),
             'a_t': ('break', '-'),
             'font_size': self.font_size,
@@ -284,7 +267,6 @@ class Command:
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'shell_path', self.shell_path)
-        ini_write(fn_config, 'op', 'shell_init_windows', self.shell_init_windows)
         ini_write(fn_config, 'op', 'print_dir', self.print_dir)
         ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
@@ -394,22 +376,6 @@ class Command:
         self.run_cmd(self.history[n])
 
 
-    def update_prompt(self):
-        if not self.p: return
-        self.getdir = True
-        self.exec(self.print_dir)
-        sleep(0.1)
-        self.getdir = False
-
-        lines = self.curdir.splitlines()
-        if IS_WIN:
-            lines = [s for s in lines if ':\\' in s]
-        if not lines: return
-        s = lines[0] + PROMPT_CHAR
-
-        dlg_proc(self.h_dlg, DLG_CTL_PROP_SET, name='prompt', prop={'cap': s,})
-
-
     def update_output(self, s):
         self.memo.set_prop(PROP_RO, False)
         self.memo.set_text_all(s)
@@ -417,7 +383,6 @@ class Command:
 
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
         self.memo.set_prop(PROP_LINE_TOP, self.memo.get_line_count()-3)
-        self.update_prompt()
 
 
     def on_exit(self, ed_self):
