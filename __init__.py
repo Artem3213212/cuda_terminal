@@ -118,6 +118,12 @@ class Command:
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
+    def exec(self, s):
+        
+        if self.p:
+            self.p.stdin.write((s+'\n').encode(CODE_TABLE))
+            self.p.stdin.flush()            
+
     def open(self):
 
         self.history = []
@@ -174,8 +180,7 @@ class Command:
             )
 
         if IS_WIN:
-            self.p.stdin.write((self.shell_init_windows+'\n').encode(CODE_TABLE))
-            self.p.stdin.flush()            
+            self.exec(self.shell_init_windows)
 
         self.p.stdin.flush()
         self.CtlTh = ControlTh(self)
@@ -377,12 +382,9 @@ class Command:
         is_sudo = not IS_WIN and line.startswith('[sudo] ')
 
         if self.add_prompt and not IS_WIN and not is_sudo:
-            self.p.stdin.write((BASH_PROMPT+text+'\n').encode(CODE_TABLE))
-            self.p.stdin.flush()
+            self.exec(BASH_PROMPT+text)
 
-        if self.p:
-            self.p.stdin.write((text+'\n').encode(CODE_TABLE))
-            self.p.stdin.flush()
+        self.exec(text)
 
 
     def run_cmd_n(self, n):
@@ -393,8 +395,7 @@ class Command:
     def update_prompt(self):
         if not self.p: return
         self.getdir = True
-        self.p.stdin.write((PRINT_DIR+'\n').encode(CODE_TABLE))
-        self.p.stdin.flush()
+        self.exec(PRINT_DIR)
         sleep(0.1)
         self.getdir = False
             
