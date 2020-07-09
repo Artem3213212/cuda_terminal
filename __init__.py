@@ -19,8 +19,8 @@ MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
 IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
-DEF_SHELL = 'cmd.exe' if IS_WIN else 'bash'
-DEF_ADD_PROMPT = not IS_WIN
+SHELL_UNIX = 'bash'
+SHELL_WIN = 'cmd.exe'
 CODE_TABLE = 'cp866' if IS_WIN else 'utf8'
 PROMPT_CHAR = '#' if IS_UNIX_ROOT else '$' if not IS_WIN else '>'
 BASH_PROMPT = 'echo [`pwd`]'+PROMPT_CHAR+' '
@@ -112,8 +112,9 @@ class Command:
         except:
             pass
 
-        self.shell_path = ini_read(fn_config, 'op', 'shell_path', DEF_SHELL)
-        self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt', bool_to_str(DEF_ADD_PROMPT)))
+        self.shell_unix = ini_read(fn_config, 'op', 'shell_unix', SHELL_UNIX)
+        self.shell_win = ini_read(fn_config, 'op', 'shell_windows', SHELL_WIN)
+        self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
 
     def exec(self, s):
@@ -167,8 +168,9 @@ class Command:
         if IS_MAC:
             env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
 
-        self.p = Popen(
-            os.path.expandvars(self.shell_path),
+        shell = self.shell_win if IS_WIN else self.shell_unix
+        self.p = Popen(        
+            os.path.expandvars(shell),
             stdin = PIPE,
             stdout = PIPE,
             stderr = STDOUT,
@@ -264,8 +266,9 @@ class Command:
 
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
         ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
-        ini_write(fn_config, 'op', 'shell_path', self.shell_path)
-        ini_write(fn_config, 'op', 'add_prompt', bool_to_str(self.add_prompt))
+        ini_write(fn_config, 'op', 'shell_unix', self.shell_unix)
+        ini_write(fn_config, 'op', 'shell_windows', self.shell_win)
+        ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
 
         file_open(fn_config)

@@ -1,7 +1,7 @@
 
-2020.07.09.2
-+ add: option 'print_dir'
-+ add: option 'shell_init_windows'
+2020.07.09.4
++ add: option 'shell_unix'
++ add: option 'shell_windows'
 - fix: initially, input was not focused
 
 2020.07.05
