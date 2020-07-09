@@ -264,12 +264,12 @@ class Command:
 
     def config(self):
 
-        ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
-        ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
-        ini_write(fn_config, 'op', 'shell_unix', self.shell_unix)
         ini_write(fn_config, 'op', 'shell_windows', self.shell_win)
+        ini_write(fn_config, 'op', 'shell_unix', self.shell_unix)
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
+        ini_write(fn_config, 'op', 'encoding', CODE_TABLE)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
+        ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
 
         file_open(fn_config)
 
