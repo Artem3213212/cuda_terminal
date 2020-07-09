@@ -185,6 +185,7 @@ class Command:
         self.CtlTh.start()
 
         timer_proc(TIMER_START, self.timer_update, 200, tag='')
+        self.show_bash_prompt()
 
 
     def init_form(self):
@@ -370,13 +371,17 @@ class Command:
                 text = 'sudo --stdin '+text[5:]
 
             #don't write prompt, if sudo asks for password
-            line = self.memo.get_text_line(self.memo.get_line_count()-1)
-            is_sudo = line.startswith('[sudo] ')
-
-            if self.add_prompt and not is_sudo:
-                self.exec(BASH_PROMPT+text)
+            #line = self.memo.get_text_line(self.memo.get_line_count()-1)
+            #is_sudo = line.startswith('[sudo] ')
 
         self.exec(text)
+        self.show_bash_prompt()
+
+
+    def show_bash_prompt(self):
+        if not IS_WIN:
+            if self.add_prompt:
+                self.exec(BASH_PROMPT)
 
 
     def run_cmd_n(self, n):
