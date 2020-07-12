@@ -59,11 +59,6 @@ class ControlTh(Thread):
         self.Cmd = Cmd
 
     def add_buf(self, s, clear):
-        if self.Cmd.getdir:
-            s = s.decode(ENC)
-            self.Cmd.curdir = pretty_path(s)
-            return
-
         self.Cmd.block.acquire()
         self.Cmd.btextchanged = True
         #limit the buffer size!
@@ -99,8 +94,6 @@ class ControlTh(Thread):
 
 
 class Command:
-    getdir = False
-    curdir = '??'
     title = 'Terminal'
     h_dlg = None
 
