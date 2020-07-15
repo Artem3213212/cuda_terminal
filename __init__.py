@@ -371,6 +371,13 @@ class Command:
         menu_proc(self.h_menu, MENU_SHOW, command=(x, y))
 
 
+    def is_sudo_input(self):
+
+        if IS_WIN:
+            return False
+        s = self.memo.get_text_line(self.memo.get_line_count()-1)
+        return s and s.startswith('[sudo] password for ') and s.endswith(': ')
+        
     def run_cmd(self, text):
 
         text = text.lstrip(' ')
@@ -393,17 +400,14 @@ class Command:
         self.history += [text]
         self.input.set_text_all('')
 
-        if not IS_WIN:
-            #support password input in sudo
-            if text.startswith('sudo '):
-                text = 'sudo --stdin '+text[5:]
-
-            #don't write prompt, if sudo asks for password
-            #line = self.memo.get_text_line(self.memo.get_line_count()-1)
-            #is_sudo = line.startswith('[sudo] ')
+        sudo = not IS_WIN and text.startswith('sudo ')
+        if sudo:
+            text = 'sudo --stdin '+text[5:]
 
         self.exec(text)
-        self.show_bash_prompt()
+
+        if not sudo:
+            self.show_bash_prompt()
 
 
     def show_bash_prompt(self):
