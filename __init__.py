@@ -25,6 +25,7 @@ SHELL_WIN = 'cmd.exe'
 ENC = 'cp866' if IS_WIN else 'utf8'
 BASH_CHAR = '#' if IS_UNIX_ROOT else '$'
 BASH_PROMPT = 'echo [$USER:$PWD]'+BASH_CHAR+' '
+BASH_CLEAR = 'clear';
 MSG_ENDED = "\nConsole process was terminated.\n"
 READSIZE = 4*1024
 HOMEDIR = os.path.expanduser('~')
@@ -372,9 +373,13 @@ class Command:
 
     def run_cmd(self, text):
 
-        #del lead spaces
-        while text.startswith(' '):
-            text = text[1:]
+        text = text.lstrip(' ')
+        
+        if text==BASH_CLEAR:
+            self.btext = b''
+            self.memo.set_text_all('')
+            self.show_bash_prompt()
+            return
 
         while len(self.history) > MAX_HISTORY:
             del self.history[0]

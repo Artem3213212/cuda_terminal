@@ -1,4 +1,7 @@
 
+2020.07.15
++ add: handle command "clear" specially (all OS)
+
 2020.07.09.A
 + add: react to Up/Down arrows: scroll memo
 * change: use Ctrl+Down for drop-down, to allow Down key in memo control
