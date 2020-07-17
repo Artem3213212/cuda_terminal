@@ -324,7 +324,7 @@ class Command:
         if (id_ctl==keys.VK_UP) and (data==''):
             self.scroll_memo(False)
             return False
-            
+
         if (id_ctl==keys.VK_DOWN) and (data==''):
             self.scroll_memo(True)
             return False
@@ -377,11 +377,11 @@ class Command:
             return False
         s = self.memo.get_text_line(self.memo.get_line_count()-1)
         return s and s.startswith('[sudo] password for ') and s.endswith(': ')
-        
+
     def run_cmd(self, text):
 
         text = text.lstrip(' ')
-        
+
         if text==BASH_CLEAR:
             self.btext = b''
             self.memo.set_text_all('')
@@ -437,16 +437,21 @@ class Command:
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
         self.memo.set_prop(PROP_LINE_TOP, self.memo.get_line_count()-3)
 
+    def stop(self):
+
+        try:
+            if self.p:
+                self.p.send_signal(SIGTERM)
+        except:
+            pass
+
 
     def on_exit(self, ed_self):
 
         timer_proc(TIMER_STOP, self.timer_update, 0)
         if not self.p: return
 
-        try:
-            self.p.send_signal(SIGTERM)
-        except:
-            pass
+        self.stop()
 
         if IS_WIN:
             self.p.wait()
@@ -459,23 +464,15 @@ class Command:
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
+        self.stop()
         if IS_WIN:
-            try:
-                self.p.send_signal(SIGTERM)
-            except:
-                pass
             self.p.wait()
-        else:
-            try:
-                self.p.send_signal(SIGTERM)
-            except:
-                pass
 
         while self.p:
             self.timer_update()
         self.open()
 
-    
+
     def scroll_memo(self, down):
         inf = self.memo.get_prop(PROP_SCROLL_VERT_INFO)
         n = inf['pos']
