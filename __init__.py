@@ -96,11 +96,10 @@ class ControlTh(Thread):
 
 class Command:
     title = 'Terminal'
+    title_float = 'CudaText Terminal (floating)'
+    hint_float = 'Terminal opened in floating window'
     h_dlg = None
-    wnd_x = 20
-    wnd_y = 20
-    wnd_w = 700
-    wnd_h = 400
+    h_embed = None
 
     def __init__(self):
 
@@ -150,30 +149,30 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(21) ]
 
     def load_pos(self):
-        
+
         if not self.floating:
             return
-        self.wnd_x = int(ini_read(fn_config, 'pos', 'x', str(self.wnd_x)))
-        self.wnd_y = int(ini_read(fn_config, 'pos', 'y', str(self.wnd_y)))
-        self.wnd_w = int(ini_read(fn_config, 'pos', 'w', str(self.wnd_w)))
-        self.wnd_h = int(ini_read(fn_config, 'pos', 'h', str(self.wnd_h)))
+        self.wnd_x = int(ini_read(fn_config, 'pos', 'x', '20'))
+        self.wnd_y = int(ini_read(fn_config, 'pos', 'y', '20'))
+        self.wnd_w = int(ini_read(fn_config, 'pos', 'w', '700'))
+        self.wnd_h = int(ini_read(fn_config, 'pos', 'h', '400'))
 
     def save_pos(self):
-        
+
         if not self.floating:
             return
-           
+
         p = dlg_proc(self.h_dlg, DLG_PROP_GET)
-        x = p['x']    
-        y = p['y']    
-        w = p['w']    
-        h = p['h']    
-            
+        x = p['x']
+        y = p['y']
+        w = p['w']
+        h = p['h']
+
         ini_write(fn_config, 'pos', 'x', str(x))
         ini_write(fn_config, 'pos', 'y', str(y))
         ini_write(fn_config, 'pos', 'w', str(w))
         ini_write(fn_config, 'pos', 'h', str(h))
-        
+
         dlg_proc(self.h_embed, DLG_FREE)
 
     def open_init(self):
@@ -184,7 +183,7 @@ class Command:
             self.load_pos()
             dlg_proc(self.h_dlg, DLG_PROP_SET, prop={
                 'border': DBORDER_SIZE,
-                'cap': 'Terminal (floating window)',
+                'cap': self.title_float,
                 'x': self.wnd_x,
                 'y': self.wnd_y,
                 'w': self.wnd_w,
@@ -195,12 +194,12 @@ class Command:
             n = dlg_proc(self.h_embed, DLG_CTL_ADD, prop='panel')
             dlg_proc(self.h_embed, DLG_CTL_PROP_SET, index=n, prop={
                 'color': 0xababab,
-                'cap': 'Terminal opened in floating window',
+                'cap': self.hint_float,
                 'align': ALIGN_CLIENT,
             })
         else:
             self.h_embed = self.h_dlg
-            
+
         app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_embed, fn_icon))
 
         self.p = None
@@ -517,7 +516,7 @@ class Command:
         sleep(0.25)
 
         self.save_pos()
-        
+
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
