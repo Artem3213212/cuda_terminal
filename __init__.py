@@ -287,7 +287,7 @@ class Command:
             'on_change': self.button_break_click,
             })
 
-        n = dlg_proc(h, DLG_CTL_ADD, 'editor')
+        n = dlg_proc(h, DLG_CTL_ADD, 'editor_combo')
         dlg_proc(h, DLG_CTL_PROP_SET, index=n, prop={
             'name': 'input',
             'border': True,
@@ -336,7 +336,6 @@ class Command:
         self.input.set_prop(PROP_MARGIN_STRING, '')
         self.input.set_prop(PROP_HILITE_CUR_LINE, False)
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
-        self.input.set_prop(PROP_MICROMAP, False)
 
         dlg_proc(h, DLG_SCALE)
         return h
@@ -460,6 +459,7 @@ class Command:
             pass
 
         self.history += [text]
+        self.input.set_prop(PROP_COMBO_ITEMS, '\n'.join(self.history))
         self.input.set_text_all('')
 
         sudo = not IS_WIN and text.startswith('sudo ')
