@@ -265,6 +265,7 @@ class Command:
             'on_key_down': self.form_key_down,
             'on_show': self.form_show,
             'on_hide': self.form_hide,
+            'on_close_query': self.form_close_query,
             'color': color_btn_back,
             })
 
@@ -404,6 +405,9 @@ class Command:
 
     def form_hide(self, id_dlg, id_ctl, data='', info=''):
         timer_proc(TIMER_STOP, self.timer_update, 0)
+
+    def form_close_query(self, id_dlg, id_ctl, data='', info=''):
+        return not self.floating
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
         timer_proc(TIMER_START, self.timer_update, 300, tag='')
