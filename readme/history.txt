@@ -1,4 +1,7 @@
 
+2020.07.29
++ add: option "floating_window" (0/1) to show terminal in separate window
+
 2020.07.15
 + add: handle command "clear" specially (all OS)
 
