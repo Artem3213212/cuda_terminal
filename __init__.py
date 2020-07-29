@@ -97,6 +97,10 @@ class ControlTh(Thread):
 class Command:
     title = 'Terminal'
     h_dlg = None
+    wnd_x = 20
+    wnd_y = 20
+    wnd_w = 700
+    wnd_h = 400
 
     def __init__(self):
 
@@ -116,6 +120,7 @@ class Command:
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
         self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
+        self.floating = str_to_bool(ini_read(fn_config, 'op', 'floating_window', '0'))
 
         self.history = []
         self.h_menu = menu_proc(0, MENU_CREATE)
@@ -144,12 +149,59 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
         self.menu_calls += [ lambda: self.run_cmd_n(21) ]
 
+    def load_pos(self):
+        
+        if not self.floating:
+            return
+        self.wnd_x = int(ini_read(fn_config, 'pos', 'x', str(self.wnd_x)))
+        self.wnd_y = int(ini_read(fn_config, 'pos', 'y', str(self.wnd_y)))
+        self.wnd_w = int(ini_read(fn_config, 'pos', 'w', str(self.wnd_w)))
+        self.wnd_h = int(ini_read(fn_config, 'pos', 'h', str(self.wnd_h)))
+
+    def save_pos(self):
+        
+        if not self.floating:
+            return
+           
+        p = dlg_proc(self.h_dlg, DLG_PROP_GET)
+        x = p['x']    
+        y = p['y']    
+        w = p['w']    
+        h = p['h']    
+            
+        ini_write(fn_config, 'pos', 'x', str(x))
+        ini_write(fn_config, 'pos', 'y', str(y))
+        ini_write(fn_config, 'pos', 'w', str(w))
+        ini_write(fn_config, 'pos', 'h', str(h))
+        
+        dlg_proc(self.h_embed, DLG_FREE)
 
     def open_init(self):
 
         self.h_dlg = self.init_form()
 
-        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_dlg, fn_icon))
+        if self.floating:
+            self.load_pos()
+            dlg_proc(self.h_dlg, DLG_PROP_SET, prop={
+                'border': DBORDER_SIZE,
+                'cap': 'Terminal (floating window)',
+                'x': self.wnd_x,
+                'y': self.wnd_y,
+                'w': self.wnd_w,
+                'h': self.wnd_h,
+            })
+            dlg_proc(self.h_dlg, DLG_SHOW_NONMODAL)
+            self.h_embed = dlg_proc(0, DLG_CREATE)
+            n = dlg_proc(self.h_embed, DLG_CTL_ADD, prop='panel')
+            dlg_proc(self.h_embed, DLG_CTL_PROP_SET, index=n, prop={
+                'color': 0xababab,
+                'cap': 'Terminal opened in floating window',
+                'align': ALIGN_CLIENT,
+            })
+        else:
+            self.h_embed = self.h_dlg
+            
+        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_embed, fn_icon))
 
         self.p = None
         self.block = Lock()
@@ -293,6 +345,7 @@ class Command:
         ini_write(fn_config, 'op', 'shell_macos', self.shell_mac)
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
+        ini_write(fn_config, 'op', 'floating_window', bool_to_str(self.floating))
         if IS_WIN:
             ini_write(fn_config, 'op', 'encoding_windows', ENC)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
@@ -463,6 +516,8 @@ class Command:
         self.block.release()
         sleep(0.25)
 
+        self.save_pos()
+        
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
