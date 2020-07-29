@@ -237,8 +237,12 @@ class Command:
         if not self.h_dlg:
             self.open_init()
 
-        app_proc(PROC_BOTTOMPANEL_ACTIVATE, (self.title, True)) #True - set focus
         dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
+
+        if self.floating:
+            dlg_proc(self.h_dlg, DLG_FOCUS)
+        else:
+            app_proc(PROC_BOTTOMPANEL_ACTIVATE, (self.title, True)) #True - set focus
 
 
     def exec(self, s):
