@@ -1,5 +1,7 @@
 
 2020.07.30
++ add: keep history in config
++ add: opt "max_keep_history" (10 items)
 + add: input field has "combobox" style with drop-down
 
 2020.07.29

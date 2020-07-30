@@ -15,7 +15,6 @@ from cudatext import *
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
 MAX_BUFFER = 100*1000
-MAX_HISTORY = 20
 IS_WIN = os.name=='nt'
 IS_MAC = sys.platform=='darwin'
 IS_UNIX_ROOT = not IS_WIN and os.geteuid()==0
@@ -120,8 +119,9 @@ class Command:
         self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
         self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
         self.floating = str_to_bool(ini_read(fn_config, 'op', 'floating_window', '0'))
+        self.max_history = int(ini_read(fn_config, 'op', 'max_history', '10'))
 
-        self.history = []
+        self.load_history()
         self.h_menu = menu_proc(0, MENU_CREATE)
 
         self.menu_calls = []
@@ -174,6 +174,24 @@ class Command:
         ini_write(fn_config, 'pos', 'h', str(h))
 
         dlg_proc(self.h_embed, DLG_FREE)
+
+    def upd_history_combo(self):
+
+        self.input.set_prop(PROP_COMBO_ITEMS, '\n'.join(self.history))
+
+    def load_history(self):
+
+        self.history = []
+        for i in range(self.max_history):
+            s = ini_read(fn_config, 'history', str(i), '')
+            if s:
+                self.history += [s]
+
+    def save_history(self):
+
+        ini_proc(INI_DELETE_SECTION, fn_config, 'history')
+        for (i, s) in enumerate(self.history):
+            ini_write(fn_config, 'history', str(i), s)
 
     def open_init(self):
 
@@ -337,6 +355,8 @@ class Command:
         self.input.set_prop(PROP_HILITE_CUR_LINE, False)
         self.input.set_prop(PROP_HILITE_CUR_COL, False)
 
+        self.upd_history_combo()
+
         dlg_proc(h, DLG_SCALE)
         return h
 
@@ -349,6 +369,7 @@ class Command:
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
         ini_write(fn_config, 'op', 'floating_window', bool_to_str(self.floating))
+        ini_write(fn_config, 'op', 'max_history', str(self.max_history))
         if IS_WIN:
             ini_write(fn_config, 'op', 'encoding_windows', ENC)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
@@ -449,7 +470,7 @@ class Command:
             self.show_bash_prompt()
             return
 
-        while len(self.history) > MAX_HISTORY:
+        while len(self.history) >= self.max_history:
             del self.history[0]
 
         try:
@@ -459,7 +480,7 @@ class Command:
             pass
 
         self.history += [text]
-        self.input.set_prop(PROP_COMBO_ITEMS, '\n'.join(self.history))
+        self.upd_history_combo()
         self.input.set_text_all('')
 
         sudo = not IS_WIN and text.startswith('sudo ')
@@ -524,6 +545,7 @@ class Command:
         sleep(0.25)
 
         self.save_pos()
+        self.save_history()
 
 
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
