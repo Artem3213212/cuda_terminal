@@ -11,6 +11,7 @@ from time import sleep
 from signal import SIGTERM
 
 from cudatext import *
+#from . import pyte
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
