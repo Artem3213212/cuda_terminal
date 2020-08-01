@@ -71,15 +71,21 @@ class ControlTh(Thread):
     def run(self):
         if not IS_WIN:
             while True:
+                if not self.Cmd.p:
+                    sleep(0.5)
+                    continue
                 s = self.Cmd.p.stdout.read(READSIZE)
                 if self.Cmd.p.poll() != None:
                     s = MSG_ENDED.encode(ENC)
                     self.add_buf(s, True)
-                    break
-                if s != '':
+                    # don't break, shell will be restarted
+                elif s != '':
                     self.add_buf(s, False)
         else:
             while True:
+                if not self.Cmd.p:
+                    sleep(0.5)
+                    continue
                 pp1 = self.Cmd.p.stdout.tell()
                 self.Cmd.p.stdout.seek(0, 2)
                 pp2 = self.Cmd.p.stdout.tell()
@@ -87,8 +93,8 @@ class ControlTh(Thread):
                 if self.Cmd.p.poll() != None:
                     s = MSG_ENDED.encode(ENC)
                     self.add_buf(s, True)
-                    break
-                if pp2!=pp1:
+                    # don't break, shell will be restarted
+                elif pp2!=pp1:
                     s = self.Cmd.p.stdout.read(pp2-pp1)
                     self.add_buf(s, False)
                 sleep(0.02)
@@ -227,20 +233,7 @@ class Command:
         self.block.acquire()
         self.btext = b''
 
-        env = os.environ
-        if IS_MAC:
-            env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
-
-        shell = self.shell_win if IS_WIN else self.shell_mac if IS_MAC else self.shell_unix
-        self.p = Popen(
-            os.path.expandvars(shell),
-            stdin = PIPE,
-            stdout = PIPE,
-            stderr = STDOUT,
-            shell = IS_WIN,
-            bufsize = 0,
-            env = env
-            )
+        self.open_process()
 
         self.p.stdin.flush()
         self.CtlTh = ControlTh(self)
@@ -250,6 +243,24 @@ class Command:
         self.show_bash_prompt()
 
 
+    def open_process(self):
+
+        env = os.environ
+        if IS_MAC:
+            env['PATH'] += ':/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin'
+
+        shell = self.shell_win if IS_WIN else self.shell_mac if IS_MAC else self.shell_unix
+
+        self.p = Popen(
+            os.path.expandvars(shell),
+            stdin = PIPE,
+            stdout = PIPE,
+            stderr = STDOUT,
+            shell = IS_WIN,
+            bufsize = 0,
+            env = env
+            )
+        
     def open(self):
 
         #dont init form twice!
@@ -527,6 +538,8 @@ class Command:
         try:
             if self.p:
                 self.p.send_signal(SIGTERM)
+                if IS_WIN:
+                    self.p.wait()
         except:
             pass
 
@@ -538,12 +551,11 @@ class Command:
 
         self.stop()
 
-        if IS_WIN:
-            self.p.wait()
         while self.p:
             self.timer_update()
 
-        self.block.release()
+        if self.block.locked():
+            self.block.release()
         sleep(0.25)
 
         self.save_pos()
@@ -553,12 +565,11 @@ class Command:
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
         self.stop()
-        if IS_WIN:
-            self.p.wait()
 
-        while self.p:
-            self.timer_update()
-        self.open()
+        #while self.p:
+            #self.timer_update()
+
+        self.open_process()
 
 
     def scroll_memo(self, down):
