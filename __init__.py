@@ -105,7 +105,6 @@ class Command:
     title_float = 'CudaText Terminal'
     hint_float = 'Terminal opened in floating window'
     h_dlg = None
-    h_embed = None
 
     def __init__(self):
 
@@ -220,17 +219,17 @@ class Command:
                 'h': self.wnd_h,
             })
             dlg_proc(self.h_dlg, DLG_SHOW_NONMODAL)
-            self.h_embed = dlg_proc(0, DLG_CREATE)
-            n = dlg_proc(self.h_embed, DLG_CTL_ADD, prop='panel')
-            dlg_proc(self.h_embed, DLG_CTL_PROP_SET, index=n, prop={
+            h_embed = dlg_proc(0, DLG_CREATE)
+            n = dlg_proc(h_embed, DLG_CTL_ADD, prop='panel')
+            dlg_proc(h_embed, DLG_CTL_PROP_SET, index=n, prop={
                 'color': 0xababab,
                 'cap': self.hint_float,
                 'align': ALIGN_CLIENT,
             })
         else:
-            self.h_embed = self.h_dlg
+            h_embed = self.h_dlg
 
-        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, self.h_embed, fn_icon))
+        app_proc(PROC_BOTTOMPANEL_ADD_DIALOG, (self.title, h_embed, fn_icon))
 
         self.p = None
         self.block = Lock()
