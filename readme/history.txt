@@ -2,6 +2,7 @@
 2020.08.01
 + add: "break" now runs shell again
 - fix: app process was not terminated on exit
+- fix: focusing floating window if sidebar button clicked
 
 2020.07.30
 + add: keep history in config
