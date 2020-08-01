@@ -389,8 +389,7 @@ class Command:
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
         ini_write(fn_config, 'op', 'floating_window', bool_to_str(self.floating))
         ini_write(fn_config, 'op', 'max_history', str(self.max_history))
-        if IS_WIN:
-            ini_write(fn_config, 'op', 'encoding_windows', ENC)
+        ini_write(fn_config, 'op', 'encoding_windows', ENC)
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
 
