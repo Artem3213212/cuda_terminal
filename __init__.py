@@ -541,9 +541,8 @@ class Command:
 
         try:
             if self.p:
-                self.p.send_signal(SIGTERM)
-                if IS_WIN:
-                    self.p.wait()
+                self.p.terminate()
+                #self.p.send_signal(SIGTERM)
         except:
             pass
 
