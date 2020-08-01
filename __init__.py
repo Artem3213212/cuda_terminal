@@ -332,7 +332,7 @@ class Command:
             'a_r': ('break', '['),
             'a_t': ('break', '-'),
             'font_size': cur_font_size,
-            'texthint': 'Enter commands here',
+            'texthint': 'Enter command here',
             })
         self.input = Editor(dlg_proc(h, DLG_CTL_HANDLE, index=n))
 
