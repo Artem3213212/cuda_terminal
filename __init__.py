@@ -182,8 +182,6 @@ class Command:
         ini_write(fn_config, 'pos', 'w', str(w))
         ini_write(fn_config, 'pos', 'h', str(h))
 
-        dlg_proc(self.h_embed, DLG_FREE)
-
 
     def upd_history_combo(self):
 
