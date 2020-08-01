@@ -383,7 +383,8 @@ class Command:
 
         # log("Entering in timer_update")
         self.btextchanged = False
-        self.block.release()
+        if self.block.locked():
+            self.block.release()
         sleep(0.03)
         self.block.acquire()
         if self.btextchanged:
