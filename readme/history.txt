@@ -1,5 +1,6 @@
 
 2020.08.01
++ add: hotkeys PageUp/PageDown
 + add: option "floating_window_topmost"
 + add: "break" now runs shell again
 + add: allow to close floating window by x
