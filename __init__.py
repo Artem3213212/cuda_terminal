@@ -124,6 +124,7 @@ class Command:
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
         self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
         self.floating = str_to_bool(ini_read(fn_config, 'op', 'floating_window', '0'))
+        self.floating_topmost = str_to_bool(ini_read(fn_config, 'op', 'floating_window_topmost', '0'))
 
         try:
             self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
@@ -225,6 +226,7 @@ class Command:
                 'y': self.wnd_y,
                 'w': self.wnd_w,
                 'h': self.wnd_h,
+                'topmost': self.floating_topmost,
             })
             dlg_proc(self.h_dlg, DLG_SHOW_NONMODAL)
             h_embed = dlg_proc(0, DLG_CREATE)
@@ -397,6 +399,7 @@ class Command:
         ini_write(fn_config, 'op', 'add_prompt_unix', bool_to_str(self.add_prompt))
         ini_write(fn_config, 'op', 'dark_colors', bool_to_str(self.dark_colors))
         ini_write(fn_config, 'op', 'floating_window', bool_to_str(self.floating))
+        ini_write(fn_config, 'op', 'floating_window_topmost', bool_to_str(self.floating_topmost))
         ini_write(fn_config, 'op', 'max_history', str(self.max_history))
         ini_write(fn_config, 'op', 'font_size', str(self.font_size))
         ini_write(fn_config, 'op', 'max_buffer_size', str(MAX_BUFFER))
