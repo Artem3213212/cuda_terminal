@@ -102,7 +102,7 @@ class ControlTh(Thread):
 
 class Command:
     title = 'Terminal'
-    title_float = 'CudaText Terminal (floating)'
+    title_float = 'CudaText Terminal'
     hint_float = 'Terminal opened in floating window'
     h_dlg = None
     h_embed = None
@@ -155,6 +155,7 @@ class Command:
         self.menu_calls += [ lambda: self.run_cmd_n(20) ]
         self.menu_calls += [ lambda: self.run_cmd_n(21) ]
 
+
     def load_pos(self):
 
         if not self.floating:
@@ -163,6 +164,7 @@ class Command:
         self.wnd_y = int(ini_read(fn_config, 'pos', 'y', '20'))
         self.wnd_w = int(ini_read(fn_config, 'pos', 'w', '700'))
         self.wnd_h = int(ini_read(fn_config, 'pos', 'h', '400'))
+
 
     def save_pos(self):
 
@@ -182,9 +184,11 @@ class Command:
 
         dlg_proc(self.h_embed, DLG_FREE)
 
+
     def upd_history_combo(self):
 
         self.input.set_prop(PROP_COMBO_ITEMS, '\n'.join(self.history))
+
 
     def load_history(self):
 
@@ -194,11 +198,13 @@ class Command:
             if s:
                 self.history += [s]
 
+
     def save_history(self):
 
         ini_proc(INI_DELETE_SECTION, fn_config, 'history')
         for (i, s) in enumerate(self.history):
             ini_write(fn_config, 'history', str(i), s)
+
 
     def open_init(self):
 
@@ -260,6 +266,7 @@ class Command:
             bufsize = 0,
             env = env
             )
+
 
     def open(self):
 
@@ -444,9 +451,11 @@ class Command:
 
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
+
     def form_close_query(self, id_dlg, id_ctl, data='', info=''):
 
         return False
+
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
 
@@ -475,6 +484,7 @@ class Command:
             return False
         s = self.memo.get_text_line(self.memo.get_line_count()-1)
         return s and s.startswith('[sudo] password for ') and s.endswith(': ')
+
 
     def run_cmd(self, text):
 
@@ -537,6 +547,7 @@ class Command:
         self.memo.cmd(cmds.cCommand_GotoTextEnd)
         self.memo.set_prop(PROP_LINE_TOP, self.memo.get_line_count()-3)
 
+
     def stop(self):
 
         try:
@@ -561,11 +572,13 @@ class Command:
         self.save_pos()
         self.save_history()
 
+
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
         self.stop()
         self.open_process()
         self.show_bash_prompt()
+
 
     def scroll_memo(self, down):
 
