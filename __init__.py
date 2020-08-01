@@ -421,11 +421,6 @@ class Command:
             self.update_output(self.btext.decode(ENC))
 
 
-    def memo_page_size(self):
-
-        return max(2, self.memo.get_prop(PROP_VISIBLE_LINES)-1)
-
-
     def form_key_down(self, id_dlg, id_ctl, data='', info=''):
 
         #Enter
@@ -438,20 +433,20 @@ class Command:
 
         #Up/Down: scroll memo
         if (id_ctl==keys.VK_UP) and (data==''):
-            self.scroll_memo(-1)
+            self.memo.cmd(cmds.cCommand_ScrollLineUp)
             return False
 
         if (id_ctl==keys.VK_DOWN) and (data==''):
-            self.scroll_memo(+1)
+            self.memo.cmd(cmds.cCommand_ScrollLineDown)
             return False
 
         #PageUp/PageDown: scroll memo
         if (id_ctl==keys.VK_PAGEUP) and (data==''):
-            self.scroll_memo(-self.memo_page_size())
+            self.memo.cmd(cmds.cCommand_ScrollPageUp)
             return False
 
         if (id_ctl==keys.VK_PAGEDOWN) and (data==''):
-            self.scroll_memo(+self.memo_page_size())
+            self.memo.cmd(cmds.cCommand_ScrollPageDown)
             return False
 
         #Ctrl+Down: history menu
