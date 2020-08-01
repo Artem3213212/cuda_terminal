@@ -30,6 +30,7 @@ MSG_ENDED = "\nConsole process was terminated.\n"
 READSIZE = 4*1024
 HOMEDIR = os.path.expanduser('~')
 INPUT_H = 26
+stop_t = False # stop thread
 
 def log(s):
     # Change conditional to True to log messages in a Debug process
@@ -69,8 +70,10 @@ class ControlTh(Thread):
         self.Cmd.block.release()
 
     def run(self):
+        global stop_t
         if not IS_WIN:
             while True:
+                if stop_t: return
                 if not self.Cmd.p:
                     sleep(0.5)
                     continue
@@ -83,6 +86,7 @@ class ControlTh(Thread):
                     self.add_buf(s, False)
         else:
             while True:
+                if stop_t: return
                 if not self.Cmd.p:
                     sleep(0.5)
                     continue
@@ -260,7 +264,7 @@ class Command:
             bufsize = 0,
             env = env
             )
-        
+
     def open(self):
 
         #dont init form twice!
@@ -549,15 +553,14 @@ class Command:
 
     def on_exit(self, ed_self):
 
-        timer_proc(TIMER_STOP, self.timer_update, 0)
-        if not self.p: return
+        global stop_t
+        stop_t = True
 
+        timer_proc(TIMER_STOP, self.timer_update, 0)
         self.stop()
 
         if self.block.locked():
             self.block.release()
-
-        sleep(0.25)
 
         self.save_pos()
         self.save_history()
