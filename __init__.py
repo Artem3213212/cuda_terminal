@@ -542,6 +542,7 @@ class Command:
         try:
             if self.p:
                 self.p.terminate()
+                self.p.wait()
         except:
             pass
 
@@ -564,6 +565,7 @@ class Command:
 
         self.stop()
         self.open_process()
+        self.show_bash_prompt()
 
     def scroll_memo(self, down):
 
