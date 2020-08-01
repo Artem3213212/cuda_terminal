@@ -441,12 +441,15 @@ class Command:
 
 
     def form_hide(self, id_dlg, id_ctl, data='', info=''):
+
         timer_proc(TIMER_STOP, self.timer_update, 0)
 
     def form_close_query(self, id_dlg, id_ctl, data='', info=''):
+
         return False
 
     def form_show(self, id_dlg, id_ctl, data='', info=''):
+
         timer_proc(TIMER_START, self.timer_update, 300, tag='')
 
 
@@ -507,6 +510,7 @@ class Command:
 
 
     def show_bash_prompt(self):
+
         if not IS_WIN:
             if self.add_prompt:
                 self.exec(BASH_PROMPT)
@@ -573,6 +577,7 @@ class Command:
 
 
     def scroll_memo(self, down):
+
         inf = self.memo.get_prop(PROP_SCROLL_VERT_INFO)
         n = inf['pos']
         nmax = inf['pos_last']
