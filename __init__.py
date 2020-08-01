@@ -1,17 +1,13 @@
+import sys
 import datetime
 import os
-import sys
+from time import sleep
+from subprocess import Popen, PIPE, STDOUT
+from threading import Thread, Lock
 
 import cudatext_keys as keys
 import cudatext_cmd as cmds
-
-from subprocess import Popen, PIPE, STDOUT
-from threading import Thread, Lock, active_count
-from time import sleep
-from signal import SIGTERM
-
 from cudatext import *
-#from . import pyte
 
 fn_icon = os.path.join(os.path.dirname(__file__), 'terminal.png')
 fn_config = os.path.join(app_path(APP_DIR_SETTINGS), 'cuda_terminal.ini')
@@ -546,7 +542,6 @@ class Command:
         try:
             if self.p:
                 self.p.terminate()
-                #self.p.send_signal(SIGTERM)
         except:
             pass
 
