@@ -122,14 +122,23 @@ class Command:
         self.shell_mac = ini_read(fn_config, 'op', 'shell_macos', SHELL_MAC)
         self.shell_win = ini_read(fn_config, 'op', 'shell_windows', SHELL_WIN)
         self.add_prompt = str_to_bool(ini_read(fn_config, 'op', 'add_prompt_unix', '1'))
-        self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
         self.dark_colors = str_to_bool(ini_read(fn_config, 'op', 'dark_colors', '1'))
         self.floating = str_to_bool(ini_read(fn_config, 'op', 'floating_window', '0'))
-        self.max_history = int(ini_read(fn_config, 'op', 'max_history', '10'))
+
+        try:
+            self.font_size = int(ini_read(fn_config, 'op', 'font_size', '9'))
+        except:
+            pass
+
+        try:
+            self.max_history = int(ini_read(fn_config, 'op', 'max_history', '10'))
+        except:
+            pass
 
         self.load_history()
         self.h_menu = menu_proc(0, MENU_CREATE)
 
+        #for-loop don't work here
         self.menu_calls = []
         self.menu_calls += [ lambda: self.run_cmd_n(0) ]
         self.menu_calls += [ lambda: self.run_cmd_n(1) ]
