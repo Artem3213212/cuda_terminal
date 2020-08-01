@@ -1,4 +1,7 @@
 
+2020.08.01
++ add: "break" now runs shell again
+
 2020.07.30
 + add: keep history in config
 + add: opt "max_keep_history" (10 items)
