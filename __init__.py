@@ -596,18 +596,6 @@ class Command:
         self.show_bash_prompt()
 
 
-    def scroll_memo(self, delta):
-
-        inf = self.memo.get_prop(PROP_SCROLL_VERT_INFO)
-        n = inf['pos']
-        nmax = inf['pos_last']
-        if delta>0:
-            n = min(n+delta, nmax)
-        else:
-            n = max(n+delta, 0)
-        self.memo.set_prop(PROP_SCROLL_VERT, n)
-
-
     def dofocus(self, tag='', info=''):
 
         timer_proc(TIMER_STOP, self.dofocus, 0)
