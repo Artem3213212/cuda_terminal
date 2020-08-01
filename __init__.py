@@ -274,7 +274,8 @@ class Command:
         dlg_proc(self.h_dlg, DLG_CTL_FOCUS, name='input')
 
         if self.floating:
-            dlg_proc(self.h_dlg, DLG_FOCUS)
+            #via timer, to support clicking sidebar button
+            timer_proc(TIMER_START, self.dofocus, 300, tag='')
         else:
             app_proc(PROC_BOTTOMPANEL_ACTIVATE, (self.title, True)) #True - set focus
 
@@ -587,3 +588,9 @@ class Command:
         else:
             n = max(n-1, 0)
         self.memo.set_prop(PROP_SCROLL_VERT, n)
+
+
+    def dofocus(self, tag='', info=''):
+
+        timer_proc(TIMER_STOP, self.dofocus, 0)
+        dlg_proc(self.h_dlg, DLG_FOCUS)
