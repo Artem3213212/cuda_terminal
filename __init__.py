@@ -555,26 +555,18 @@ class Command:
 
         self.stop()
 
-        while self.p:
-            self.timer_update()
-
         if self.block.locked():
             self.block.release()
+
         sleep(0.25)
 
         self.save_pos()
         self.save_history()
 
-
     def button_break_click(self, id_dlg, id_ctl, data='', info=''):
 
         self.stop()
-
-        #while self.p:
-            #self.timer_update()
-
         self.open_process()
-
 
     def scroll_memo(self, down):
 
