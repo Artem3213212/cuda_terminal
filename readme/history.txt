@@ -1,5 +1,6 @@
 
 2020.08.01
++ add: option "floating_window_topmost"
 + add: "break" now runs shell again
 + add: allow to close floating window by x
 - fix: app process was not terminated on exit
